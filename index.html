@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .activity-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="vanta-bg" class="fixed inset-0 -z-10 opacity-20"></div>
+    
+    <!-- Sidebar Navigation -->
+    <div class="flex">
+        <div class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64 h-screen px-4 py-8 bg-white border-r">
+                <div class="flex items-center justify-center h-16">
+                    <div class="flex items-center">
+                        <i data-feather="activity" class="w-8 h-8 text-indigo-600"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-800">FitAI</span>
+                    </div>
+                </div>
+                <div class="flex flex-col justify-between flex-1 mt-6">
+                    <nav>
+                        <a href="#" class="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-lg">
+                            <i data-feather="home" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Dashboard</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i data-feather="trending-up" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Analytics</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i data-feather="target" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Goals</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i data-feather="heart" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Health</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i data-feather="users" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Community</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i data-feather="settings" class="w-5 h-5"></i>
+                            <span class="mx-4 font-medium">Settings</span>
+                        </a>
+                    </nav>
+                    <div class="px-4 py-4 mt-4 bg-gray-100 rounded-lg">
+                        <div class="flex items-center">
+                            <img class="w-10 h-10 rounded-full" src="http://static.photos/people/200x200/1" alt="User">
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-700">John Doe</p>
+                                <p class="text-xs text-gray-500">Premium Member</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-x-hidden">
+            <!-- Mobile Header -->
+            <div class="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b">
+                <div class="flex items-center">
+                    <i data-feather="activity" class="w-6 h-6 text-indigo-600"></i>
+                    <span class="ml-2 text-lg font-bold text-gray-800">FitAI</span>
+                </div>
+                <button id="mobile-menu-button" class="text-gray-500 focus:outline-none">
+                    <i data-feather="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Welcome Section -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Good Morning, John</h1>
+                        <p class="text-gray-600">Here's your fitness overview for today</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <div class="relative">
+                            <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-indigo-500">
+                                <option>Today</option>
+                                <option>This Week</option>
+                                <option>This Month</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i data-feather="chevron-down" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Steps Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden p-6" data-aos="fade-up">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Steps</p>
+                                <h2 class="text-3xl font-bold text-gray-800 mt-1">8,742</h2>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i data-feather="trending-up" class="w-4 h-4 inline"></i> 12% from yesterday
+                                </p>
+                            </div>
+                            <div class="relative">
+                                <svg class="w-16 h-16" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#e6e6e6"
+                                        stroke-width="3"
+                                        stroke-dasharray="100, 100"
+                                    />
+                                    <path d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#4f46e5"
+                                        stroke-width="3"
+                                        stroke-dasharray="75, 100"
+                                        class="progress-ring__circle"
+                                    />
+                                </svg>
+                                <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-800">75%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Heart Rate Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden p-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Heart Rate</p>
+                                <h2 class="text-3xl font-bold text-gray-800 mt-1 pulse-animation">132</h2>
+                                <p class="text-yellow-500 text-sm mt-2">
+                                    <i data-feather="activity" class="w-4 h-4 inline"></i> During workout
+                                </p>
+                            </div>
+                            <div class="text-red-500">
+                                <i data-feather="heart" class="w-12 h-12"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calories Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden p-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Calories</p>
+                                <h2 class="text-3xl font-bold text-gray-800 mt-1">1,842</h2>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i data-feather="zap" class="w-4 h-4 inline"></i> 350 from workout
+                                </p>
+                            </div>
+                            <div class="text-orange-500">
+                                <i data-feather="fire" class="w-12 h-12"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recovery Card -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden p-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-medium">Recovery</p>
+                                <h2 class="text-3xl font-bold text-gray-800 mt-1">28h</h2>
+                                <p class="text-blue-500 text-sm mt-2">
+                                    <i data-feather="clock" class="w-4 h-4 inline"></i> Optimal rest period
+                                </p>
+                            </div>
+                            <div class="text-blue-500">
+                                <i data-feather="moon" class="w-12 h-12"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Activity Chart -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6" data-aos="fade-up">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Weekly Activity</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-full">Steps</button>
+                                <button class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">Calories</button>
+                                <button class="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">Heart Rate</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <!-- Chart placeholder - would be replaced with Chart.js or similar in a real app -->
+                            <div class="flex items-end h-full border-b border-l border-gray-200">
+                                <div class="flex-1 flex justify-around">
+                                    <div class="h-1/4 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Mon: 2,500 steps"></div>
+                                    <div class="h-1/2 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Tue: 5,000 steps"></div>
+                                    <div class="h-3/4 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Wed: 7,500 steps"></div>
+                                    <div class="h-full w-6 bg-indigo-400 rounded-t hover:bg-indigo-600" title="Thu: 10,000 steps"></div>
+                                    <div class="h-2/3 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Fri: 6,700 steps"></div>
+                                    <div class="h-1/3 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Sat: 3,300 steps"></div>
+                                    <div class="h-1/5 w-6 bg-indigo-200 rounded-t hover:bg-indigo-400" title="Sun: 1,800 steps"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-around text-xs text-gray-500 mt-2">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommendations -->
+                    <div class="bg-white rounded-xl shadow-md p-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">AI Recommendations</h3>
+                            <i data-feather="cpu" class="w-5 h-5 text-indigo-500"></i>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-indigo-50 rounded-lg">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-indigo-100 p-2 rounded-full">
+                                        <i data-feather="clock" class="w-4 h-4 text-indigo-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-800">Optimal Workout Time</p>
+                                        <p class="text-xs text-gray-600 mt-1">Based on your patterns, tomorrow at 7:30 AM would be ideal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-green-100 p-2 rounded-full">
+                                        <i data-feather="zap" class="w-4 h-4 text-green-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-800">Energy Boost</p>
+                                        <p class="text-xs text-gray-600 mt-1">Try a banana 30 minutes before your next workout.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-50 rounded-lg">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-yellow-100 p-2 rounded-full">
+                                        <i data-feather="alert-triangle" class="w-4 h-4 text-yellow-600"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-800">Injury Risk</p>
+                                        <p class="text-xs text-gray-600 mt-1">Your running form shows 15% higher impact than usual.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6" data-aos="fade-up">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Recent Activities</h3>
+                            <button class="text-indigo-600 text-sm font-medium">View All</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                                <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-lg">
+                                    <i data-feather="run" class="w-5 h-5 text-indigo-600"></i>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-gray-800">Morning Run</p>
+                                        <span class="text-xs text-gray-500">45 min ago</span>
+                                    </div>
+                                    <div class="flex items-center mt-1 text-xs text-gray-500">
+                                        <span>5.2 km • 26:15 min • 412 kcal</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                                <div class="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                                    <i data-feather="activity" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-gray-800">HIIT Workout</p>
+                                        <span class="text-xs text-gray-500">3 hours ago</span>
+                                    </div>
+                                    <div class="flex items-center mt-1 text-xs text-gray-500">
+                                        <span>32 min • Avg HR 148 bpm • 387 kcal</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                                <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                                    <i data-feather="moon" class="w-5 h-5 text-blue-600"></i>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-medium text-gray-800">Sleep Analysis</p>
+                                        <span class="text-xs text-gray-500">Yesterday</span>
+                                    </div>
+                                    <div class="flex items-center mt-1 text-xs text-gray-500">
+                                        <span>7h 22m • 92% quality • 4 REM cycles</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goals Progress -->
+                    <div class="bg-white rounded-xl shadow-md p-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Weekly Goals</h3>
+                            <button class="text-indigo-600 text-sm font-medium">Edit</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">Steps</span>
+                                    <span>8,742 / 50,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-indigo-600 h-2 rounded-full" style="width: 17%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">Workouts</span>
+                                    <span>2 / 5</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">Water</span>
+                                    <span>1.2 / 2.5 L</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 48%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium">Sleep</span>
+                                    <span>6.5 / 8 h</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 81%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> Add New Goal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Workout Plans -->
+                <div class="mt-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-gray-800">Recommended Workouts</h3>
+                        <button class="text-indigo-600 text-sm font-medium">View All</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden activity-card transition" data-aos="fade-up">
+                            <div class="h-40 bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                                <i data-feather="activity" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="p-6">
+                                <h4 class="font-bold text-gray-800">HIIT Burn</h4>
+                                <p class="text-gray-600 text-sm mt-1">30 min • High Intensity</p>
+                                <div class="flex items-center mt-4">
+                                    <div class="flex -space-x-2">
+                                        <img class="w-8 h-8 rounded-full border-2 border-white" src="http://static.photos/people/200x200/2" alt="Trainer">
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-xs font-medium text-gray-600">With Trainer Jane</p>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 py-2 px-4 rounded-lg transition duration-200">
+                                    Start Workout
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden activity-card transition" data-aos="fade-up" data-aos-delay="100">
+                            <div class="h-40 bg-gradient-to-r from-green-500 to-teal-600 flex items-center justify-center">
+                                <i data-feather="wind" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="p-6">
+                                <h4 class="font-bold text-gray-800">Yoga Flow</h4>
+                                <p class="text-gray-600 text-sm mt-1">45 min • Low Intensity</p>
+                                <div class="flex items-center mt-4">
+                                    <div class="flex -space-x-2">
+                                        <img class="w-8 h-8 rounded-full border-2 border-white" src="http://static.photos/people/200x200/3" alt="Trainer">
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-xs font-medium text-gray-600">With Trainer Mike</p>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-4 bg-green-100 hover:bg-green-200 text-green-700 py-2 px-4 rounded-lg transition duration-200">
+                                    Start Workout
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden activity-card transition" data-aos="fade-up" data-aos-delay="200">
+                            <div class="h-40 bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center">
+                                <i data-feather="run" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div class="p-6">
+                                <h4 class="font-bold text-gray-800">Speed Run</h4>
+                                <p class="text-gray-600 text-sm mt-1">5 km • Medium Intensity</p>
+                                <div class="flex items-center mt-4">
+                                    <div class="flex -space-x-2">
+                                        <img class="w-8 h-8 rounded-full border-2 border-white" src="http://static.photos/people/200x200/4" alt="Trainer">
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-xs font-medium text-gray-600">With Trainer Alex</p>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-4 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg transition duration-200">
+                                    Start Workout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b">
+            <div class="flex items-center">
+                <i data-feather="activity" class="w-6 h-6 text-indigo-600"></i>
+                <span class="ml-2 text-lg font-bold text-gray-800">FitAI</span>
+            </div>
+            <button id="mobile-menu-close" class="text-gray-500 focus:outline-none">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="block px-4 py-2 text-gray-700 bg-gray-100 rounded-lg">Dashboard</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Analytics</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Goals</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Health</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Community</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Device Sync</a>
+            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Data Export</a>
+</body>
+</html>
