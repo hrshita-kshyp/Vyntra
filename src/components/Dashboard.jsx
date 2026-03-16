@@ -3,7 +3,7 @@ import React from 'react';
 import StatCard from './StatCard';
 import { useFitnessData } from '../hooks/useFitnessData';
 import { useAIInsights } from '../hooks/useAIInsights';
-import { Brain, Zap, Clock, TrendingUp, Loader2 } from 'lucide-react';
+import { Brain, Zap, Clock, TrendingUp, Loader2, Activity } from 'lucide-react';
 
 const Dashboard = () => {
   const { steps, heartRate, calories, recovery } = useFitnessData();
