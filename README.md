@@ -55,4 +55,4 @@ create table ai_logs (
   timestamp timestamp with time zone default now()
 );
 ```
->>>>>>> 43e2937 (docs: Resolve README merge conflict and update with SaaS features)
+```
