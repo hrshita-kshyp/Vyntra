@@ -7,6 +7,12 @@ export const useAuth = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+            console.error("Missing Supabase credentials in .env");
+            setLoading(false);
+            return;
+        }
+        
         // Check active sessions and sets the user
         supabase.auth.getSession().then(({ data: { session } }) => {
             setUser(session?.user ?? null);

@@ -1,22 +1,24 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper to save user fitness pulse
 export const syncFitnessSession = async (userId, fitnessData) => {
+    if (!import.meta.env.VITE_SUPABASE_URL) return { error: { message: "Supabase not configured" } };
+    
     const { data, error } = await supabase
         .from('fitness_sessions')
         .insert([
             { 
                 user_id: userId, 
-                steps: fitnessData.steps.current,
-                heart_rate: fitnessData.heartRate.current,
-                calories: fitnessData.calories.current,
-                recovery_hours: fitnessData.recovery.current,
+                steps: fitnessData.steps?.current,
+                heart_rate: fitnessData.heartRate?.current,
+                calories: fitnessData.calories?.current,
+                recovery_hours: fitnessData.recovery?.current,
                 timestamp: new Date().toISOString()
             }
         ]);
@@ -25,6 +27,8 @@ export const syncFitnessSession = async (userId, fitnessData) => {
 
 // Helper to save AI Insights
 export const saveAIInsight = async (userId, insightData) => {
+    if (!import.meta.env.VITE_SUPABASE_URL) return { error: { message: "Supabase not configured" } };
+
     const { data, error } = await supabase
         .from('ai_logs')
         .insert([
