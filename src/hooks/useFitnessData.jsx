@@ -1,8 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { getFitnessData } from '../services/fitnessService';
+import { useAuth } from './useAuth';
+import { syncFitnessSession } from '../services/supabaseService';
 
 export const useFitnessData = () => {
+  const { user } = useAuth();
   const [data, setData] = useState({
     steps: { current: 0, goal: 10000 },
     heartRate: { current: 72 },
@@ -39,6 +41,19 @@ export const useFitnessData = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Sync with Supabase every 30 seconds if user is logged in
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const syncInterval = setInterval(async () => {
+      const { error } = await syncFitnessSession(user.id, data);
+      if (error) console.error("Sync Error:", error.message);
+      else console.log("Biometrics synced to Supabase");
+    }, 30000); 
+
+    return () => clearInterval(syncInterval);
+  }, [user, data]);
 
   const startWorkout = () => {
     setWorkoutMode(true);

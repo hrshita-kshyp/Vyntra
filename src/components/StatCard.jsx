@@ -36,18 +36,24 @@ const StatCard = ({ title, value, goal, status, icon, color = 'blue', trend, tre
             </div>
             
             <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider">{title}</p>
-            <div className="flex items-baseline space-x-1 mt-1">
+            <div className="flex items-baseline flex-wrap gap-x-2 mt-1">
                 <h2 className={`text-3xl font-black text-gray-900 ${pulse ? 'animate-pulse' : ''}`}>
                     {value}
                 </h2>
-                {status && <span className="text-gray-400 text-xs font-medium ml-1">{status}</span>}
+                {status && <span className="text-gray-400 text-xs font-bold uppercase">{status}</span>}
             </div>
 
             {goal && (
-                <div className="mt-4">
-                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                <div className="mt-6">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Progress</span>
+                        <span className="text-[10px] font-bold text-gray-600 italic">
+                            {Math.round(Math.min((parseFloat(String(value).replace(/,/g, '')) / goal) * 100, 100))}%
+                        </span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                         <div 
-                            className={`h-full rounded-full ${colorStyle.bg.replace('50', '500')}`} 
+                            className={`h-full rounded-full transition-all duration-1000 ${colorStyle.bg.replace('50', '500')}`} 
                             style={{ width: `${Math.min((parseFloat(String(value).replace(/,/g, '')) / goal) * 100, 100)}%` }}
                         ></div>
                     </div>

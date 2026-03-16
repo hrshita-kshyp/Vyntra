@@ -50,7 +50,7 @@ const FitnessTracker = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto bg-black text-white rounded-3xl shadow-2xl overflow-hidden border border-gray-700">
+        <div className="w-full bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-500 p-4 relative overflow-hidden">
                 <div className="absolute inset-0 bg-black opacity-10"></div>
@@ -76,14 +76,14 @@ const FitnessTracker = () => {
                             <span className="text-yellow-400 font-semibold text-sm">AI Insight</span>
                             <div className="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                         </div>
-                        <p className="text-sm text-white leading-relaxed font-medium">{aiInsight}</p>
+                        <p className="text-sm text-white leading-relaxed font-medium">{aiInsight || "Analyzing biometrics..."}</p>
                     </div>
                 </div>
             </div>
             {/* Content Area */}
-            <div className="p-4 bg-gray-900 min-h-96">{renderTabContent()}</div>
+            <div className="p-6 bg-white min-h-96">{renderTabContent()}</div>
             {/* Bottom Navigation */}
-            <div className="bg-gray-800 p-3 border-t border-gray-700">
+            <div className="bg-gray-50 p-4 border-t border-gray-100">
                 <div className="flex justify-around space-x-2">
                     <TabButton
                         id="dashboard"
