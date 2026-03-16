@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getFitnessData } from '../services/fitnessService';
 
-const useFitnessData = () => {
+export const useFitnessData = () => {
   const [data, setData] = useState({
     steps: { current: 0, goal: 10000 },
     heartRate: { current: 72 },
@@ -54,4 +54,3 @@ const useFitnessData = () => {
   };
 };
 
-export default useFitnessData;

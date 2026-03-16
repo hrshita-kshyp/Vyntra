@@ -5,7 +5,7 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell 
 } from 'recharts';
 import { Heart, Moon, Zap, Shield, TrendingUp, Activity, Trophy } from 'lucide-react';
-import useFitnessData from '../hooks/useFitnessData';
+import { useFitnessData } from '../hooks/useFitnessData';
 
 const mockDailyData = [
   { name: 'Mon', steps: 4500, hr: 72, recovery: 24, sleep: 7.5 },
