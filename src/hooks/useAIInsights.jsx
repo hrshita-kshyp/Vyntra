@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAIRecommendations } from '../services/aiService';
-import useFitnessData from './useFitnessData';
+import { useFitnessData } from './useFitnessData';
 
 export const useAIInsights = () => {
     const fitnessData = useFitnessData();
