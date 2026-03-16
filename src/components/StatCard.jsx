@@ -48,7 +48,7 @@ const StatCard = ({ title, value, goal, status, icon, color = 'blue', trend, tre
                     <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                         <div 
                             className={`h-full rounded-full ${colorStyle.bg.replace('50', '500')}`} 
-                            style={{ width: `${Math.min((parseFloat(value.replace(/,/g, '')) / goal) * 100, 100)}%` }}
+                            style={{ width: `${Math.min((parseFloat(String(value).replace(/,/g, '')) / goal) * 100, 100)}%` }}
                         ></div>
                     </div>
                 </div>
