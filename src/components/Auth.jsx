@@ -41,7 +41,7 @@ const Auth = () => {
                         <div className="p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg mb-4">
                             <Activity className="text-white w-8 h-8" />
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">FitAI 2026</h1>
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Vyntra 2026</h1>
                         <p className="text-gray-400 text-sm mt-2">Next-Gen Predictive Personal Training</p>
                     </div>
 

@@ -1,4 +1,4 @@
-# FitAI 2026: Predictive Fitness SaaS
+# Vyntra 2026: Predictive Fitness SaaS
 
 FitAI 2026 is a premium, next-generation fitness tracking platform designed for the year 2026. It leverages **Predictive AI** to provide metabolic insights, injury prevention strategies, and real-time biometric analysis.
 
