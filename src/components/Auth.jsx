@@ -9,12 +9,14 @@ const Auth = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const { signIn, signUp } = useAuth();
 
     const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setSuccessMessage(null);
         
         try {
             const { error } = isSignUp 
@@ -22,6 +24,12 @@ const Auth = () => {
                 : await signIn(email, password);
             
             if (error) throw error;
+
+            if (isSignUp) {
+                setSuccessMessage("A verification link has been dispatched to your email. Please verify to initialize your Vyntra ecosystem.");
+                setEmail('');
+                setPassword('');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -79,6 +87,12 @@ const Auth = () => {
                         {error && (
                             <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                                 {error}
+                            </div>
+                        )}
+
+                        {successMessage && (
+                            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 text-sm">
+                                {successMessage}
                             </div>
                         )}
 
