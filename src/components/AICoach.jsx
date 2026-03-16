@@ -2,7 +2,7 @@
 import React from 'react';
 import { Target, Heart, Moon, Brain, TrendingUp, Zap, Loader2 } from 'lucide-react';
 import { useAIInsights } from '../hooks/useAIInsights';
-import useFitnessData from '../hooks/useFitnessData';
+import { useFitnessData } from '../hooks/useFitnessData';
 
 const AICoach = () => {
     const { insights, loading, error } = useAIInsights();
