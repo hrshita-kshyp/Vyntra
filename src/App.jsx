@@ -11,9 +11,9 @@ import { Loader2 } from 'lucide-react';
 
 const Layout = () => {
   return (
-    <div className="flex bg-gray-50 min-h-screen">
+    <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen">
       <Sidebar />
-      <main className="flex-1 md:ml-64 p-4 md:p-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8">
         <Outlet />
       </main>
     </div>
