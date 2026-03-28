@@ -53,9 +53,15 @@ const DeviceConnect = () => {
           </div>
 
           {connected && (
-            <div className="flex items-center space-x-2 bg-green-500/20 border border-green-500/30 px-4 py-2 rounded-full">
-              <CheckCircle size={15} className="text-green-400" />
-              <span className="text-green-400 font-semibold text-sm">Connected</span>
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-full border ${
+              fitData?.averages?.avgSteps > 0
+                ? 'bg-green-500/20 border-green-500/30'
+                : 'bg-yellow-500/20 border-yellow-500/30'
+            }`}>
+              <CheckCircle size={15} className={fitData?.averages?.avgSteps > 0 ? 'text-green-400' : 'text-yellow-400'} />
+              <span className={`font-semibold text-sm ${fitData?.averages?.avgSteps > 0 ? 'text-green-400' : 'text-yellow-400'}`}>
+                {fitData?.averages?.avgSteps > 0 ? 'Connected' : 'Connected — No Data'}
+              </span>
             </div>
           )}
         </div>
@@ -128,12 +134,40 @@ const DeviceConnect = () => {
           </div>
         ) : (
           <div className="mt-6 space-y-5">
-            {fitData && (
+            {fitData && fitData.averages.avgSteps === 0 ? (
+              // No data found — show sync instructions
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 space-y-4">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle size={20} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-yellow-300 font-bold">No fitness data found in your Google Fit account</p>
+                    <p className="text-yellow-500 text-sm mt-1">Your device may not be syncing to Google Fit yet.</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm text-gray-300">
+                  <p className="font-bold text-white text-xs uppercase tracking-widest">How to sync your device:</p>
+                  <div className="space-y-2">
+                    <div className="flex items-start space-x-2">
+                      <span className="text-yellow-400 font-black">Mi Band / Xiaomi</span>
+                    </div>
+                    <ol className="text-gray-400 space-y-1.5 ml-2 text-xs leading-relaxed">
+                      <li>1. Open <strong className="text-white">Mi Fitness</strong> app on your phone</li>
+                      <li>2. Go to <strong className="text-white">Profile → Settings → Connected apps</strong></li>
+                      <li>3. Tap <strong className="text-white">Google Fit</strong> → Enable sync</li>
+                      <li>4. Wait a few minutes, then come back and reconnect</li>
+                    </ol>
+                  </div>
+                  <div className="border-t border-white/10 pt-3 text-gray-400 text-xs">
+                    <strong className="text-white">Android phone users:</strong> Google Fit tracks steps automatically using your phone — no setup needed. Just make sure Google Fit app is installed and open it once.
+                  </div>
+                </div>
+              </div>
+            ) : fitData ? (
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: "Today's Steps", value: fitData.today.steps.current.toLocaleString() },
-                  { label: 'Heart Rate', value: `${fitData.today.heartRate.current} bpm` },
-                  { label: 'Calories', value: fitData.today.calories.current.toLocaleString() },
+                  { label: 'Heart Rate',    value: fitData.today.heartRate.current ? `${fitData.today.heartRate.current} bpm` : '-- bpm' },
+                  { label: 'Calories',      value: fitData.today.calories.current.toLocaleString() },
                 ].map((item) => (
                   <div key={item.label} className="bg-white/10 rounded-2xl p-4 text-center">
                     <p className="text-2xl font-black">{item.value}</p>
@@ -141,7 +175,8 @@ const DeviceConnect = () => {
                   </div>
                 ))}
               </div>
-            )}
+            ) : null}
+
             <button
               onClick={disconnect}
               className="flex items-center space-x-2 text-red-400 hover:text-red-300 transition-colors font-semibold text-sm"

@@ -56,6 +56,7 @@ export const useGoogleFit = () => {
     disconnectGoogleFit();
     setConnected(false);
     setFitData(null);
+    setError(null);
   };
 
   return { connected, fitData, loading, error, connect, disconnect, refresh: loadFitData };

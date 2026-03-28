@@ -48,15 +48,30 @@ export const connectGoogleFit = async () => {
     const tokenClient = window.google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
       scope: FITNESS_SCOPES,
+      // Called on successful token grant OR token errors
       callback: (response) => {
         if (response.error) {
-          reject(new Error(response.error_description || response.error));
+          const msg =
+            response.error === 'access_denied'
+              ? 'Access denied. Please allow the requested permissions.'
+              : response.error_description || response.error;
+          reject(new Error(msg));
           return;
         }
-        // Store with 55-minute expiry (tokens last 1 hour, 5-min buffer)
         localStorage.setItem(TOKEN_KEY, response.access_token);
         localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + 55 * 60 * 1000));
         resolve(response.access_token);
+      },
+      // Called when the popup is closed or dismissed — without this the
+      // Promise hangs forever and loading never resets
+      error_callback: (err) => {
+        const msg =
+          err.type === 'popup_closed'
+            ? 'Popup was closed. Please try again.'
+            : err.type === 'popup_failed_to_open'
+            ? 'Popup was blocked. Please allow popups for this site.'
+            : err.message || 'Google authorization failed. Please try again.';
+        reject(new Error(msg));
       },
     });
     tokenClient.requestAccessToken();
@@ -99,10 +114,13 @@ export const fetchGoogleFitData = async (accessToken) => {
   );
 
   if (res.status === 401) {
-    // Token expired — clear it so the user re-connects
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(TOKEN_EXPIRY_KEY);
     throw new Error('Session expired. Please reconnect Google Fit.');
+  }
+
+  if (res.status === 403) {
+    throw new Error('Fitness API not enabled. In Google Cloud Console → APIs & Services → Library → search "Fitness API" → Enable it, then reconnect.');
   }
 
   if (!res.ok) throw new Error(`Google Fit API error (${res.status})`);

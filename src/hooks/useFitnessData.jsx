@@ -26,7 +26,9 @@ export const useFitnessData = () => {
   const { user } = useAuth();
   const { connected, fitData, loading: fitLoading } = useGoogleFit();
 
-  const isLive = connected && !!fitData;
+  // Only treat as live if real data actually exists (avgSteps > 0)
+  const hasRealData = connected && !!fitData && fitData.averages.avgSteps > 0;
+  const isLive = hasRealData;
 
   // Derive current data from Google Fit or demo
   const currentData = isLive ? fitData.today : DEMO_DATA;

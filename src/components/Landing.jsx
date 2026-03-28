@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Activity, Brain, TrendingDown, Zap, Shield, BarChart2,
+  Brain, TrendingDown, Zap, Shield, BarChart2,
   CheckCircle, ArrowRight, Star, ChevronDown, Heart, Footprints
 } from 'lucide-react';
+import Logo from './Logo';
 
 // ─── Animated counter ────────────────────────────────────────────────────────
 const Counter = ({ target, suffix = '' }) => {
@@ -103,10 +104,7 @@ const Landing = () => {
         scrolled ? 'bg-gray-950/90 backdrop-blur-xl border-b border-white/5 py-3' : 'py-5'
       }`}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Activity className="w-7 h-7 text-blue-500" />
-            <span className="text-xl font-black tracking-tight">Vyntra</span>
-          </div>
+          <Logo size={32} showWordmark wordmarkClass="text-white text-xl" />
           <div className="flex items-center space-x-3">
             <button
               onClick={goToAuth}
@@ -458,10 +456,9 @@ const Landing = () => {
       {/* ── Footer ── */}
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
-            <Activity className="w-5 h-5 text-blue-500" />
-            <span className="font-black text-white tracking-tight">Vyntra</span>
-            <span className="text-gray-600 text-sm ml-2">© 2026</span>
+          <div className="flex items-center gap-3">
+            <Logo size={24} showWordmark wordmarkClass="text-white" />
+            <span className="text-gray-600 text-sm">© 2026</span>
           </div>
           <p className="text-gray-600 text-xs text-center">
             Not a medical device. BioAge Score™ is an estimate for wellness tracking purposes only.

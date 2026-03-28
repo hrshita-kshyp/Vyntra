@@ -5,8 +5,9 @@ import StatCard from './StatCard';
 import BioAgeScore from './BioAgeScore';
 import { useFitnessData } from '../hooks/useFitnessData';
 import { useAIInsights } from '../hooks/useAIInsights';
-import { Brain, Zap, Clock, TrendingUp, Loader2, Wifi, WifiOff, Link } from 'lucide-react';
+import { Brain, Zap, Clock, TrendingUp, Loader2, Wifi, Watch } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isGoogleFitConnected } from '../services/googleFitService';
 
 // Custom tooltip for the trend chart
 const ChartTooltip = ({ active, payload, label }) => {
@@ -27,6 +28,73 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { steps, heartRate, calories, recovery, weeklyData, averages, isLive, fitLoading } = useFitnessData();
   const { insights, loading: aiLoading } = useAIInsights();
+  const deviceConnected = isGoogleFitConnected();
+
+  // No device linked at all — show connect prompt
+  if (!deviceConnected) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-6 px-4">
+        <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center">
+          <Watch size={36} className="text-blue-500" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">No device connected</h2>
+          <p className="text-gray-400 mt-2 max-w-sm">Link Google Fit to see your real health data and calculate your BioAge Score™</p>
+        </div>
+        <button
+          onClick={() => navigate('/app/connect')}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/25"
+        >
+          Connect a Device
+        </button>
+      </div>
+    );
+  }
+
+  // Device connected but loading
+  if (fitLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
+        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+        <p className="text-gray-400 font-semibold">Fetching your Google Fit data...</p>
+      </div>
+    );
+  }
+
+  // Device connected but no data found
+  if (!isLive) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-6 px-4">
+        <div className="w-20 h-20 bg-yellow-50 rounded-3xl flex items-center justify-center">
+          <Watch size={36} className="text-yellow-500" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Google Fit connected — no data yet</h2>
+          <p className="text-gray-400 mt-2 max-w-md">
+            Your Google Fit account doesn't have any fitness data. If you use a Mi Band, enable Google Fit sync in the Mi Fitness app first.
+          </p>
+        </div>
+        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-left max-w-md w-full space-y-3 text-sm">
+          <p className="font-black text-gray-700 text-xs uppercase tracking-widest">Mi Band / Xiaomi users:</p>
+          <ol className="text-gray-500 space-y-2 leading-relaxed">
+            <li>1. Open <strong className="text-gray-800">Mi Fitness</strong> app</li>
+            <li>2. Profile → Settings → <strong className="text-gray-800">Connected apps</strong></li>
+            <li>3. Tap <strong className="text-gray-800">Google Fit</strong> → Enable</li>
+            <li>4. Wait a few minutes, then refresh this page</li>
+          </ol>
+          <p className="text-gray-400 text-xs pt-2 border-t border-gray-100">
+            Android users without a band: Install the Google Fit app and open it once — your phone tracks steps automatically.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/app/connect')}
+          className="text-blue-600 hover:text-blue-700 font-bold underline underline-offset-4 text-sm"
+        >
+          Manage Devices
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

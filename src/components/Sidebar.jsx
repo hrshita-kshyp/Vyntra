@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, TrendingUp, Target, LogOut, Activity, User, Menu, X, Watch } from 'lucide-react';
+import Logo from './Logo';
 import { useAuth } from '../hooks/useAuth';
 
 const Sidebar = () => {
@@ -21,9 +22,8 @@ const Sidebar = () => {
 
     const MenuContent = () => (
         <>
-            <div className="flex items-center px-4 mb-10">
-                <Activity className="w-8 h-8 text-blue-600" />
-                <span className="ml-2 text-xl font-bold text-gray-800 tracking-tight">Vyntra</span>
+            <div className="px-4 mb-10">
+                <Logo size={36} showWordmark wordmarkClass="text-gray-900 text-xl" />
             </div>
 
             <nav className="flex-1 space-y-1">
@@ -76,10 +76,7 @@ const Sidebar = () => {
         <>
             {/* Mobile Header */}
             <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 z-40 flex items-center justify-between px-6">
-                <div className="flex items-center">
-                    <Activity className="w-6 h-6 text-blue-600" />
-                    <span className="ml-2 font-bold text-gray-900 tracking-tight">Vyntra</span>
-                </div>
+                <Logo size={28} showWordmark wordmarkClass="text-gray-900" />
                 <button 
                     onClick={toggleSidebar}
                     className="p-2 bg-gray-50 rounded-xl text-gray-600 hover:text-blue-600 transition-colors"
