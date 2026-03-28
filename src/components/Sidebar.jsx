@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, Target, LogOut, Activity, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Target, LogOut, Activity, User, Menu, X, Watch } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const Sidebar = () => {
@@ -10,10 +10,11 @@ const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-        { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
-        { icon: Activity, label: 'AI Coach', path: '/ai-coach' },
-        { icon: Target, label: 'Goals', path: '/tracker' },
+        { icon: LayoutDashboard, label: 'Dashboard',   path: '/app'              },
+        { icon: Watch,           label: 'Devices',     path: '/app/connect'      },
+        { icon: TrendingUp,      label: 'Analytics',   path: '/app/analytics'    },
+        { icon: Activity,        label: 'AI Coach',    path: '/app/ai-coach'     },
+        { icon: Target,          label: 'Goals',       path: '/app/tracker'      },
     ];
 
     const toggleSidebar = () => setIsOpen(!isOpen);
@@ -28,7 +29,8 @@ const Sidebar = () => {
             <nav className="flex-1 space-y-1">
                 {menuItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
+                    const isActive = location.pathname === item.path ||
+                        (item.path !== '/app' && location.pathname.startsWith(item.path));
                     return (
                         <Link
                             key={item.path}
