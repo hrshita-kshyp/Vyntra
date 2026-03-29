@@ -38,7 +38,9 @@ export const getStoredToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
-export const connectGoogleFit = async () => {
+export const hasPreviousConnection = () => !!localStorage.getItem(TOKEN_KEY);
+
+export const connectGoogleFit = async (options = {}) => {
   if (!GOOGLE_CLIENT_ID) {
     throw new Error('VITE_GOOGLE_CLIENT_ID is not set in your .env file.');
   }
@@ -74,9 +76,13 @@ export const connectGoogleFit = async () => {
         reject(new Error(msg));
       },
     });
-    tokenClient.requestAccessToken();
+    tokenClient.requestAccessToken(options);
   });
 };
+
+// Attempt to silently renew the token without showing a popup.
+// Works when the user has already granted permissions in this browser session.
+export const silentRefreshToken = () => connectGoogleFit({ prompt: '' });
 
 export const disconnectGoogleFit = () => {
   const token = localStorage.getItem(TOKEN_KEY);

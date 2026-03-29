@@ -26,8 +26,9 @@ export const useFitnessData = () => {
   const { user } = useAuth();
   const { connected, fitData, loading: fitLoading } = useGoogleFit();
 
-  // Only treat as live if real data actually exists (avgSteps > 0)
-  const hasRealData = connected && !!fitData && fitData.averages.avgSteps > 0;
+  // Treat as live if real step data exists — don't gate on current connection state
+  // so data stays visible even while a silent token refresh is in progress
+  const hasRealData = !!fitData && fitData.averages.avgSteps > 0;
   const isLive = hasRealData;
 
   // Derive current data from Google Fit or demo
