@@ -13,6 +13,7 @@ const HealthAnalytics = lazy(() => import("./components/HealthAnalytics"));
 import FitnessTracker from "./components/FitnessTracker";
 import DeviceConnect from "./components/DeviceConnect";
 import Auth from "./components/Auth";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 import Sidebar from "./components/Sidebar";
 import { GoogleFitProvider } from "./hooks/useGoogleFit";
 import { useAuth } from "./hooks/useAuth";
@@ -38,13 +39,11 @@ const AppLayout = () => (
 function App() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="loading-screen">
-        <Loader2 className="spin" />
-      </div>
-    );
-  }
+  const loadingScreen = (
+    <div className="loading-screen">
+      <Loader2 className="spin" />
+    </div>
+  );
 
   return (
     <GoogleFitProvider>
@@ -52,15 +51,35 @@ function App() {
         <Routes>
           {/* Public landing page */}
           <Route path="/" element={<Landing />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
 
           {/* Auth — redirect to /app if already logged in */}
           <Route
             path="/auth"
-            element={!user ? <Auth /> : <Navigate to="/app" />}
+            element={
+              loading ? (
+                loadingScreen
+              ) : !user ? (
+                <Auth />
+              ) : (
+                <Navigate to="/app" replace />
+              )
+            }
           />
 
           {/* Protected app routes */}
-          <Route path="/app" element={<AppLayout />}>
+          <Route
+            path="/app"
+            element={
+              loading ? (
+                loadingScreen
+              ) : user ? (
+                <AppLayout />
+              ) : (
+                <Navigate to="/auth" replace />
+              )
+            }
+          >
             <Route index element={<Dashboard />} />
             <Route path="ai-coach" element={<AICoach />} />
             <Route path="analytics" element={<HealthAnalytics />} />

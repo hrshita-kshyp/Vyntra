@@ -1,25 +1,24 @@
+import { vyntraMarkPaths } from "../assets/vyntraMark";
+
 export default function Logo({
   size = 30,
   showWordmark = false,
   className = "",
 }) {
   return (
-    <span className={`brand ${className}`}>
+    <span className={`brand ${className}`} role="img" aria-label="Vyntra">
       <svg
         width={size}
         height={size}
-        viewBox="0 0 32 32"
+        viewBox="0 0 40 40"
         fill="none"
         aria-hidden="true"
       >
-        <path d="M3 6h7l6 17L22 6h7L18 29h-4L3 6Z" fill="currentColor" />
-        <path d="M14 3h4v8h-4z" fill="currentColor" />
+        {vyntraMarkPaths.map((path) => (
+          <path key={path} d={path} fill="currentColor" />
+        ))}
       </svg>
-      {showWordmark && (
-        <span>
-          vyntra<span className="brand-period">.</span>
-        </span>
-      )}
+      {showWordmark && <span aria-hidden="true">vyntra</span>}
     </span>
   );
 }

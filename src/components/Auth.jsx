@@ -169,12 +169,10 @@ export default function Auth() {
               {signup ? "Sign in" : "Create an account"}
             </button>
           </p>
-          <div className="auth-demo">
-            <span>Just looking around?</span>
-            <Link to="/app" className="text-link">
-              Try the sample workspace <ArrowUpRight size={16} />
-            </Link>
-          </div>
+          <p className="auth-privacy">
+            Read how your information is handled in our{" "}
+            <Link to="/privacy">Privacy Policy</Link>.
+          </p>
         </div>
         <span className="auth-bottom">YOUR PACE. YOUR SPACE.</span>
       </main>

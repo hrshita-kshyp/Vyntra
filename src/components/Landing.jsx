@@ -37,7 +37,7 @@ export default function Landing() {
               you can actually keep.
             </p>
             <div className="hero-actions">
-              <Link className="button button-dark" to="/app">
+              <Link className="button button-dark" to="/auth">
                 Explore your dashboard <ArrowUpRight size={18} />
               </Link>
               <a className="text-link" href="#inside">
@@ -45,7 +45,7 @@ export default function Landing() {
               </a>
             </div>
             <p className="hero-footnote">
-              Try the sample workspace. No account needed.
+              Sign in or create an account to get started.
             </p>
           </div>
           <div
@@ -127,8 +127,8 @@ export default function Landing() {
               Your daily check-in, a week of activity, personal targets, and a
               coach when you want a little direction.
             </p>
-            <Link className="text-link" to="/app">
-              Open the sample workspace <ArrowUpRight size={18} />
+            <Link className="text-link" to="/auth">
+              Open your workspace <ArrowUpRight size={18} />
             </Link>
           </div>
           <div className="inside-preview">
@@ -160,7 +160,7 @@ export default function Landing() {
             <br />
             starts with a check-in.
           </h2>
-          <Link className="button button-dark" to="/app">
+          <Link className="button button-dark" to="/auth">
             Give it a try <ArrowUpRight size={18} />
           </Link>
         </section>
@@ -168,6 +168,7 @@ export default function Landing() {
       <footer className="public-footer">
         <Logo size={23} showWordmark />
         <span>Move well. Live a little more.</span>
+        <Link to="/privacy">Privacy policy</Link>
         <Link to="/auth">
           Your account <ArrowUpRight size={14} />
         </Link>
