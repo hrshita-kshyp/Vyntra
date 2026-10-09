@@ -2308,6 +2308,23 @@ input:focus {
 }
 
 /* Personal journal */
+.landing-film { margin:0; min-width:0; }
+.landing-film video { display:block; width:100%; aspect-ratio:16/9; background:#203b31; border-radius:12px; border:1px solid var(--line); }
+.landing-film figcaption, .feature-story figcaption { color:#6f7c65; font-size:11px; line-height:1.6; margin-top:12px; }
+.feature-stories { margin:0 7%; border-top:1px solid var(--line); }
+.feature-story { display:grid; grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr); gap:64px; align-items:center; padding:70px 0; border-bottom:1px solid var(--line); }
+.feature-story:nth-child(even) > div { order:2; }
+.feature-story h2, .landing-plans h2 { font-family:var(--serif); font-size:clamp(32px,3.4vw,48px); line-height:1.12; font-weight:400; letter-spacing:-0.03em; margin:20px 0; }
+.feature-story p:not(.kicker), .landing-plans p:not(.kicker) { font-size:15px; line-height:1.8; color:#64745c; margin-bottom:24px; }
+.feature-story figure { margin:0; min-width:0; }
+.feature-story img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; box-shadow:0 12px 30px #203b3108; }
+.landing-plans { margin:70px 7%; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+.pro-preview { background:#edf1e6; border:1px solid var(--line); border-radius:12px; padding:35px; }
+.pro-preview h3 { font-family:var(--serif); font-size:32px; font-weight:400; margin:22px 0 12px; }
+.landing-plans .pro-price { font-size:38px; color:var(--ink); margin-bottom:12px; }
+.pro-price span { font-size:14px; }
+@media(max-width:900px) { .feature-story { gap:28px; } .landing-plans { gap:28px; } }
+@media(max-width:700px) { .feature-story, .landing-plans { grid-template-columns:1fr; gap:24px; } .feature-story { padding:40px 0; } .feature-story:nth-child(even) > div { order:0; } .feature-stories { margin:0 24px; } .landing-plans { margin:45px 24px; } .pro-preview { padding:25px; } }
 .journal-panel { margin-bottom: 24px; }
 .journal-toolbar, .journal-footer { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; margin:20px 0; }
 .journal-toolbar .field-label { max-width:220px; }

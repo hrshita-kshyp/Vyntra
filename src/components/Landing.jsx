@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Footprints,
   Heart,
-  MoveUpRight,
 } from "lucide-react";
 import Logo from "./Logo";
 
@@ -33,8 +32,8 @@ export default function Landing() {
               <em>Keep it going.</em>
             </h1>
             <p className="hero-description">
-              Less noise. A clearer picture of your activity. A few good habits
-              you can actually keep.
+              Keep your movement, energy, and small habits together. A daily
+              check-in that gives your numbers a little context.
             </p>
             <div className="hero-actions">
               <Link className="button button-dark" to="/auth">
@@ -124,34 +123,34 @@ export default function Landing() {
               <em>Room to breathe.</em>
             </h2>
             <p>
-              Your daily check-in, a week of activity, personal targets, and a
-              coach when you want a little direction.
+              See how daily check-ins, a movement journal, and personal targets
+              come together. Take a 30-second tour before signing in.
             </p>
             <Link className="text-link" to="/auth">
               Open your workspace <ArrowUpRight size={18} />
             </Link>
           </div>
-          <div className="inside-preview">
-            <div className="preview-top">
-              <span>YOUR WEEK</span>
-              <span>Sample activity</span>
-            </div>
-            <strong>
-              8,792 <small>average steps / day</small>
-            </strong>
-            <div className="preview-bars">
-              {[62, 82, 54, 88, 70, 100, 76].map((height, i) => (
-                <div key={i}>
-                  <span style={{ height: `${height}%` }} />
-                  <small>{["M", "T", "W", "T", "F", "S", "S"][i]}</small>
-                </div>
-              ))}
-            </div>
-            <div className="preview-bottom">
-              <span>Small steps, steady progress.</span>
-              <MoveUpRight size={20} />
-            </div>
-          </div>
+          <figure className="landing-film">
+            <video controls playsInline preload="none" poster="/media/vyntra-poster.png" aria-label="Vyntra 30-second product introduction with instrumental music">
+              <source src="/media/vyntra-intro.mp4" type="video/mp4" />
+              Your browser does not support video. <a href="/media/vyntra-intro.mp4">Download the product tour.</a>
+            </video>
+            <figcaption>30-second tour · Music on play · Sample account and manual data</figcaption>
+          </figure>
+        </section>
+        <section className="feature-stories" aria-label="A closer look at Vyntra">
+          {[
+            { title: "Keep the story beside the stats.", kicker: "YOUR DAILY CONTEXT", text: "How did you feel? How much time did you have? Save a quick check-in, a note, and the small habits that helped your day.", image: "daily-check-in", alt: "Daily check-in showing mood, movement time, habits and a workout journal" },
+            { title: "A week you can actually read.", kicker: "YOUR ACTIVITY", text: "Review your movement across the week. Missing readings stay blank, and manually logged activity stays separate from device data.", image: "activity", alt: "Weekly activity charts with sample manually logged steps and energy" },
+            { title: "Your pace. Your targets.", kicker: "YOUR PERSONAL GOALS", text: "Set your own daily goals and adjust them as life changes. Log a walk, a yoga session, or a workout without needing a wearable.", image: "goals", alt: "Personal goals screen showing editable activity targets" },
+          ].map(feature => <article className="feature-story" key={feature.image}>
+            <div><p className="kicker">{feature.kicker}</p><h2>{feature.title}</h2><p>{feature.text}</p><Link className="text-link" to="/auth">Try it for yourself <ArrowUpRight size={16} /></Link></div>
+            <figure><img src={`/media/${feature.image}.png`} alt={feature.alt} width="1440" height="1000" loading="lazy" decoding="async" /><figcaption>Product preview · Sample account and manual data</figcaption></figure>
+          </article>)}
+        </section>
+        <section className="landing-plans" aria-label="Vyntra plans">
+          <div><p className="kicker">START SMALL. KEEP GOING.</p><h2>Basic stays free.</h2><p>Get started with activity tracking, daily check-ins, a movement journal, and personal goals.</p><Link className="button button-dark" to="/auth">Start for free <ArrowUpRight size={18} /></Link></div>
+          <div className="pro-preview"><span className="status">PRO · COMING SOON</span><h3>7 days to try Pro.</h3><p className="pro-price">₹99 <span>/ month after trial</span></p><p>Pro and its 7-day trial will be available when paid features and billing are ready. Signing up today starts a free Basic account.</p></div>
         </section>
         <section className="landing-cta">
           <p className="kicker">START WHERE YOU ARE</p>
