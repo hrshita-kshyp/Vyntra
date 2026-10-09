@@ -8,7 +8,7 @@ export const useAuth = () => {
 
     useEffect(() => {
         if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-            console.error("Missing Supabase credentials in .env");
+
             setLoading(false);
             return;
         }
@@ -17,7 +17,7 @@ export const useAuth = () => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setUser(session?.user ?? null);
             setLoading(false);
-        });
+        }).catch(() => setLoading(false));
 
         // Listen for changes on auth state (logged in, signed out, etc.)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -28,9 +28,16 @@ export const useAuth = () => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const signUp = (email, password) => supabase.auth.signUp({ email, password });
-    const signIn = (email, password) => supabase.auth.signInWithPassword({ email, password });
+    const configured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const unavailable = () => Promise.resolve({ error: { message: 'Account sign-in is not configured yet. You can explore the demo instead.' } });
+    const signUp = (email, password) => configured ? supabase.auth.signUp({ email, password }) : unavailable();
+    const signIn = (email, password) => configured ? supabase.auth.signInWithPassword({ email, password }) : unavailable();
     const signOut = () => supabase.auth.signOut();
+    const signInWithGoogle = () =>
+        configured ? supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: `${window.location.origin}/app` },
+        }) : unavailable();
 
-    return { user, loading, signUp, signIn, signOut };
+    return { user, loading, signUp, signIn, signOut, signInWithGoogle };
 };

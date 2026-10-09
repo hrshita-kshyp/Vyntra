@@ -1,4 +1,4 @@
 import * as React from "react";
 
-declare const FitnessTracker: React.FC<any>;
+declare const FitnessTracker: React.FC;
 export default FitnessTracker;

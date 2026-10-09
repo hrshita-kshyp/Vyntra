@@ -1,115 +1,151 @@
-import React, { useState } from 'react';
-import { Activity, Brain, TrendingUp } from 'lucide-react';
-import Dashboard from './Dashboard';
-import AICoach from './AICoach';
-import HealthAnalytics from './HealthAnalytics';
-import { useFitnessData } from '../hooks/useFitnessData';
-import { useAIInsights } from '../hooks/useAIInsights';
+import { useState } from "react";
+import { Check, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useFitnessData } from "../hooks/useFitnessData";
+import { PageHeader, DataNote } from "./UI";
 
-const TabButton = ({ id, icon: Icon, label, active, onClick }) => (
-    <button
-        onClick={() => onClick(id)}
-        className={`flex flex-col items-center p-3 rounded-lg transition-all duration-300 ${active
-            ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:transform hover:scale-102'
-            }`}
-    >
-        <Icon size={20} />
-        <span className="text-xs mt-1 font-medium">{label}</span>
-    </button>
-);
-
-const FitnessTracker = () => {
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const { fitnessData, workoutMode, startWorkout, healthScore } = useFitnessData();
-    const { aiInsight } = useAIInsights();
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'dashboard':
-                return (
-                    <Dashboard
-                        fitnessData={fitnessData}
-                        workoutMode={workoutMode}
-                        startWorkout={startWorkout}
-                    />
-                );
-            case 'ai-coach':
-                return <AICoach fitnessData={fitnessData} />;
-            case 'health':
-                return <HealthAnalytics fitnessData={fitnessData} />;
-            default:
-                return (
-                    <Dashboard
-                        fitnessData={fitnessData}
-                        workoutMode={workoutMode}
-                        startWorkout={startWorkout}
-                    />
-                );
-        }
-    };
-
-    return (
-        <div className="w-full bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-500 p-4 relative overflow-hidden">
-                <div className="absolute inset-0 bg-black opacity-10"></div>
-                <div className="relative z-10">
-                    <div className="flex justify-between items-center mb-2">
-                        <div>
-                            <h1 className="text-xl font-bold tracking-wide">AI FitTracker Pro</h1>
-                            <p className="text-purple-200 text-sm font-medium">
-                                {new Date().toLocaleTimeString()}
-                            </p>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-3xl font-bold bg-white bg-opacity-20 rounded-full w-16 h-16 flex items-center justify-center">
-                                {healthScore}
-                            </div>
-                            <div className="text-purple-200 text-xs mt-1 font-medium">Health Score</div>
-                        </div>
-                    </div>
-                    {/* AI Insight Banner */}
-                    <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-xl p-3 mt-3 border border-white border-opacity-20">
-                        <div className="flex items-center mb-2">
-                            <Brain size={18} className="text-yellow-400 mr-2" />
-                            <span className="text-yellow-400 font-semibold text-sm">AI Insight</span>
-                            <div className="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        </div>
-                        <p className="text-sm text-white leading-relaxed font-medium">{aiInsight || "Analyzing biometrics..."}</p>
-                    </div>
+export default function FitnessTracker() {
+  const data = useFitnessData();
+  const [steps, setSteps] = useState(
+    () => localStorage.getItem("daily_step_goal") || "10000",
+  );
+  const [calories, setCalories] = useState(
+    () => localStorage.getItem("daily_calorie_goal") || "2500",
+  );
+  const [saved, setSaved] = useState(false);
+  const [baseline, setBaseline] = useState({ steps, calories });
+  function save(event) {
+    event.preventDefault();
+    localStorage.setItem("daily_step_goal", steps);
+    localStorage.setItem("daily_calorie_goal", calories);
+    setBaseline({ steps, calories });
+    setSaved(true);
+  }
+  function reset() {
+    setSteps(baseline.steps);
+    setCalories(baseline.calories);
+    setSaved(false);
+  }
+  return (
+    <div className="page">
+      <PageHeader
+        section="YOUR OWN PACE"
+        title="Something to work toward."
+        description="Set a couple of daily targets. Adjust them as life changes."
+      >
+        <DataNote live={data.isLive} />
+      </PageHeader>
+      <div className="goals-layout">
+        <form className="panel goals-form" onSubmit={save}>
+          <div className="panel-heading">
+            <h2>Daily targets</h2>
+            <span className="subtle">Saved on this device</span>
+          </div>
+          {[
+            {
+              id: "steps",
+              title: "Get your steps in",
+              description: "A daily movement target, at your own pace.",
+              value: steps,
+              set: setSteps,
+              current: data.steps.current,
+              min: 100,
+              max: 100000,
+              unit: "steps / day",
+            },
+            {
+              id: "energy",
+              title: "Your daily energy",
+              description:
+                "Total energy used through activity and everyday life.",
+              value: calories,
+              set: setCalories,
+              current: data.calories.current,
+              min: 100,
+              max: 10000,
+              unit: "kcal / day",
+            },
+          ].map((item) => (
+            <section className="goal-row" key={item.id}>
+              <div className="goal-row-heading">
+                <div>
+                  <label htmlFor={`goal-${item.id}`}>{item.title}</label>
+                  <p>{item.description}</p>
                 </div>
-            </div>
-            {/* Content Area */}
-            <div className="p-6 bg-white min-h-96">{renderTabContent()}</div>
-            {/* Bottom Navigation */}
-            <div className="bg-gray-50 p-4 border-t border-gray-100">
-                <div className="flex justify-around space-x-2">
-                    <TabButton
-                        id="dashboard"
-                        icon={Activity}
-                        label="Dashboard"
-                        active={activeTab === 'dashboard'}
-                        onClick={setActiveTab}
-                    />
-                    <TabButton
-                        id="ai-coach"
-                        icon={Brain}
-                        label="AI Coach"
-                        active={activeTab === 'ai-coach'}
-                        onClick={setActiveTab}
-                    />
-                    <TabButton
-                        id="health"
-                        icon={TrendingUp}
-                        label="Health"
-                        active={activeTab === 'health'}
-                        onClick={setActiveTab}
-                    />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default FitnessTracker;
+                <span className="goal-percentage">
+                  {Math.min(
+                    100,
+                    Math.round((item.current / Number(item.value || 1)) * 100),
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="goal-input-wrap">
+                <input
+                  id={`goal-${item.id}`}
+                  type="number"
+                  required
+                  min={item.min}
+                  max={item.max}
+                  step={100}
+                  value={item.value}
+                  onChange={(e) => {
+                    item.set(e.target.value);
+                    setSaved(false);
+                  }}
+                />
+                <span>{item.unit}</span>
+              </div>
+              <div className="metric-track">
+                <span
+                  style={{
+                    width: `${Math.min(100, (item.current / Number(item.value || 1)) * 100)}%`,
+                  }}
+                />
+              </div>
+              <p className="goal-current">
+                {item.current.toLocaleString()}{" "}
+                {item.id === "steps" ? "steps" : "kcal"}{" "}
+                {data.isLive ? "today" : "in the sample day"}
+              </p>
+            </section>
+          ))}
+          <div className="form-actions">
+            <button className="button button-dark" type="submit">
+              Save targets <Check size={16} />
+            </button>
+            <button
+              className="button button-text"
+              type="button"
+              onClick={reset}
+            >
+              Reset changes
+            </button>
+            <span className="form-success" role="status">
+              {saved ? "Targets saved." : ""}
+            </span>
+          </div>
+        </form>
+        <aside className="goals-aside">
+          <span className="kicker">A GOOD PLACE TO START</span>
+          <h2>
+            Make it
+            <br /> <em>doable.</em>
+          </h2>
+          <p>
+            A target is a guide for your day. Start with something that fits
+            your routine, then build from there.
+          </p>
+          <div className="aside-rule" />
+          <p className="fine-print">
+            Energy expenditure is the energy you use. It is not a target for
+            food intake.
+          </p>
+          <Link className="text-link" to="/app/ai-coach">
+            Find a little direction <ArrowUpRight size={16} />
+          </Link>
+        </aside>
+      </div>
+    </div>
+  );
+}

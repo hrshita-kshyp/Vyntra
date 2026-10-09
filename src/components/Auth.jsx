@@ -1,129 +1,183 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import Logo from "./Logo";
 
-import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { Activity, Mail, Lock, Loader2, UserPlus, LogIn } from 'lucide-react';
-
-const Auth = () => {
-    const [isSignUp, setIsSignUp] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
-    const { signIn, signUp } = useAuth();
-
-    const handleAuth = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        setSuccessMessage(null);
-        
-        try {
-            const { error } = isSignUp 
-                ? await signUp(email, password) 
-                : await signIn(email, password);
-            
-            if (error) throw error;
-
-            if (isSignUp) {
-                setSuccessMessage("A verification link has been dispatched to your email. Please verify to initialize your Vyntra ecosystem.");
-                setEmail('');
-                setPassword('');
-            }
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Background Aesthetic */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px]"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px]"></div>
-
-            <div className="w-full max-w-md z-10">
-                <div className="bg-gray-900/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-                    <div className="flex flex-col items-center mb-8">
-                        <div className="p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg mb-4">
-                            <Activity className="text-white w-8 h-8" />
-                        </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Vyntra 2026</h1>
-                        <p className="text-gray-400 text-sm mt-2">Next-Gen Predictive Personal Training</p>
-                    </div>
-
-                    <form onSubmit={handleAuth} className="space-y-6">
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                                <input 
-                                    type="email" 
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 transition-all"
-                                    placeholder="name@company.com"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                                <input 
-                                    type="password" 
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 transition-all"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                        </div>
-
-                        {error && (
-                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        {successMessage && (
-                            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 text-sm">
-                                {successMessage}
-                            </div>
-                        )}
-
-                        <button 
-                            disabled={loading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <>
-                                    {isSignUp ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
-                                    <span>{isSignUp ? 'Create SaaS Account' : 'Initialize Session'}</span>
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center text-gray-400 text-sm">
-                        {isSignUp ? 'Already on v2026?' : "Don't have an endpoint?"}
-                        <button 
-                            onClick={() => setIsSignUp(!isSignUp)}
-                            className="ml-2 text-blue-400 font-bold hover:underline"
-                        >
-                            {isSignUp ? 'Sign In' : 'Provision Account'}
-                        </button>
-                    </div>
-                </div>
-            </div>
+export default function Auth() {
+  const [signup, setSignup] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [busy, setBusy] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const { signIn, signUp, signInWithGoogle } = useAuth();
+  async function submit(event) {
+    event.preventDefault();
+    setBusy("email");
+    setError("");
+    setSuccess("");
+    try {
+      const result = await (signup
+        ? signUp(email, password)
+        : signIn(email, password));
+      if (result.error) throw result.error;
+      if (signup) setSuccess("Check your inbox for a verification link.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  }
+  async function google() {
+    setBusy("google");
+    setError("");
+    try {
+      const result = await signInWithGoogle();
+      if (result.error) throw result.error;
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  }
+  return (
+    <div className="auth-page">
+      <section className="auth-story">
+        <Link to="/" aria-label="Vyntra home">
+          <Logo showWordmark />
+        </Link>
+        <div>
+          <p className="kicker">YOUR EVERYDAY, A LITTLE BETTER</p>
+          <h1>
+            Come as
+            <br />
+            you are.
+            <br />
+            <em>Keep moving.</em>
+          </h1>
+          <p>
+            A simple space for your activity, your goals, and a routine that
+            feels like you.
+          </p>
         </div>
-    );
-};
-
-export default Auth;
+        <span className="auth-story-footer">
+          ONE DAY AT A TIME <span>EST. 2026</span>
+        </span>
+      </section>
+      <main className="auth-main">
+        <Link to="/" className="back-link">
+          <ArrowLeft size={16} />
+          Back to home
+        </Link>
+        <div className="auth-form-wrap">
+          <p className="kicker">YOUR VYNTRA ACCOUNT</p>
+          <h2>{signup ? "Make yourself at home." : "Welcome back."}</h2>
+          <p>
+            {signup
+              ? "Create an account to keep your activity together."
+              : "A fresh check-in is waiting for you."}
+          </p>
+          <button
+            className="button button-outline full-width"
+            onClick={google}
+            disabled={!!busy}
+          >
+            {busy === "google" ? (
+              <Loader2 size={18} className="spin" />
+            ) : (
+              <span className="google-letter">G</span>
+            )}
+            Continue with Google
+          </button>
+          <div className="form-divider">
+            <span>or use your email</span>
+          </div>
+          <form onSubmit={submit}>
+            <label className="field-label" htmlFor="auth-email">
+              Email address
+            </label>
+            <input
+              id="auth-email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label className="field-label" htmlFor="auth-password">
+              Password
+            </label>
+            <div className="password-field">
+              <input
+                id="auth-password"
+                type={visible ? "text" : "password"}
+                required
+                minLength={6}
+                autoComplete={signup ? "new-password" : "current-password"}
+                placeholder={
+                  signup ? "At least 6 characters" : "Enter your password"
+                }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="icon-button"
+                aria-label={visible ? "Hide password" : "Show password"}
+                onClick={() => setVisible(!visible)}
+              >
+                {visible ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            )}
+            {success && (
+              <p className="form-success" role="status">
+                {success}
+              </p>
+            )}
+            <button
+              className="button button-dark full-width"
+              type="submit"
+              disabled={!!busy}
+            >
+              {busy === "email" ? (
+                <Loader2 size={18} className="spin" />
+              ) : (
+                <>
+                  {signup ? "Create account" : "Sign in"}
+                  <ArrowUpRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
+          <p className="auth-switch">
+            {signup ? "Already a member?" : "New around here?"}{" "}
+            <button
+              onClick={() => {
+                setSignup(!signup);
+                setError("");
+                setSuccess("");
+              }}
+            >
+              {signup ? "Sign in" : "Create an account"}
+            </button>
+          </p>
+          <div className="auth-demo">
+            <span>Just looking around?</span>
+            <Link to="/app" className="text-link">
+              Try the sample workspace <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
+        <span className="auth-bottom">YOUR PACE. YOUR SPACE.</span>
+      </main>
+    </div>
+  );
+}

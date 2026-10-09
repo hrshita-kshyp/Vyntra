@@ -1,14 +1,14 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useGoogleFit } from './useGoogleFit';
 import { syncFitnessSession } from '../services/supabaseService';
 
 // Demo data used when no device is connected
 const DEMO_DATA = {
-  steps:     { current: 8742,  goal: 10000 },
+  steps:     { current: 8742,  goal: Number(localStorage.getItem('daily_step_goal')) || 10000 },
   heartRate: { current: 72 },
-  calories:  { current: 1842,  goal: 2500 },
+  calories:  { current: 1842,  goal: Number(localStorage.getItem('daily_calorie_goal')) || 2500 },
   recovery:  { current: 8 },
 };
 
@@ -24,39 +24,21 @@ const DEMO_WEEKLY = [
 
 export const useFitnessData = () => {
   const { user } = useAuth();
-  const { connected, fitData, loading: fitLoading } = useGoogleFit();
+  const { connected, needsReconnect, fitData, loading: fitLoading, refresh } = useGoogleFit();
 
   // Treat as live if real step data exists — don't gate on current connection state
   // so data stays visible even while a silent token refresh is in progress
-  const hasRealData = !!fitData && fitData.averages.avgSteps > 0;
+  const hasRealData = !!fitData && fitData.weeklyData.some(day => day.steps > 0 || day.heartRate != null || day.calories > 0);
   const isLive = hasRealData;
 
   // Derive current data from Google Fit or demo
   const currentData = isLive ? fitData.today : DEMO_DATA;
   const weeklyData  = isLive ? fitData.weeklyData : DEMO_WEEKLY;
   const averages    = isLive ? fitData.averages : {
-    avgSteps: 8791,
+    avgSteps: Math.round(DEMO_WEEKLY.reduce((sum, day) => sum + day.steps, 0) / DEMO_WEEKLY.length),
     avgHR: 72,
-    avgCalories: 2127,
+    avgCalories: Math.round(DEMO_WEEKLY.reduce((sum, day) => sum + day.calories, 0) / DEMO_WEEKLY.length),
   };
-
-  // Simulate real-time step/HR ticks only in demo mode
-  const [liveDemo, setLiveDemo] = useState(DEMO_DATA);
-
-  useEffect(() => {
-    if (isLive) return; // real data — no simulation needed
-
-    const interval = setInterval(() => {
-      setLiveDemo((prev) => ({
-        ...prev,
-        steps:     { ...prev.steps,     current: Math.min(prev.steps.current + Math.floor(Math.random() * 15), prev.steps.goal) },
-        heartRate: { current: Math.floor(Math.random() * 12) + 68 },
-        calories:  { ...prev.calories,  current: Math.min(prev.calories.current + 1, prev.calories.goal) },
-      }));
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [isLive]);
 
   // Sync to Supabase every 30 s when logged in and live
   useEffect(() => {
@@ -70,20 +52,23 @@ export const useFitnessData = () => {
     return () => clearInterval(sync);
   }, [user, isLive, currentData]);
 
-  const data = isLive ? currentData : liveDemo;
+  const data = currentData;
 
   return {
     // Flat fields (backward compat with Dashboard / StatCard)
-    steps:     data.steps,
+    steps:     { ...data.steps, goal: Number(localStorage.getItem('daily_step_goal')) || 10000 },
     heartRate: data.heartRate,
-    calories:  data.calories,
+    calories:  { ...data.calories, goal: Number(localStorage.getItem('daily_calorie_goal')) || 2500 },
     recovery:  data.recovery,
 
     // Extra data for charts + BioAge
     weeklyData,
     averages,
     isLive,
+    connected,
+    needsReconnect,
     fitLoading,
+    refresh,
     healthScore: 88,
   };
 };
