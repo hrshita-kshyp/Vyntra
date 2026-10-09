@@ -1,6 +1,14 @@
 # vyntra.ranuvo.tech
 
-The code's public sharing and metadata URLs now target `https://vyntra.ranuvo.tech`. Authentication uses the current browser origin and `/app`, so it works on the new domain after provider configuration. DNS and external dashboard changes have not been applied from this workspace.
+The code's public sharing and metadata URLs now target `https://vyntra.ranuvo.tech`. Authentication uses the current browser origin and `/app`, so it works on the new domain after provider configuration. The domain has been attached to the existing Vyntra Vercel production project. Vercel ownership is verified; Hostinger DNS is still pending. Google and Supabase dashboard settings still need updating.
+
+## Hostinger DNS record (confirmed through Vercel)
+
+| Type | Name | Points to | TTL |
+| --- | --- | --- | --- |
+| CNAME | vyntra | fed5576818c8b8a7.vercel-dns-017.com | Default |
+
+Vercel's domain configuration API returned this as the rank-1 recommended CNAME. The domain currently has no CNAME or A records. This record changes only the Vyntra subdomain.
 
 ## Connect the domain
 
