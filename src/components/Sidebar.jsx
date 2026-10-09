@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../hooks/useAuth";
+import { displayName } from "../utils/userProfile";
 const navigation = [
   { path: "/app", label: "Overview", icon: LayoutGrid },
   { path: "/app/analytics", label: "Activity", icon: ChartNoAxesCombined },
@@ -98,10 +99,10 @@ export default function Sidebar() {
           </div>
           <div className="account-row">
             <span className="avatar">
-              {(user?.email || "Guest")[0].toUpperCase()}
+              {displayName(user)[0].toUpperCase()}
             </span>
             <div>
-              <strong>{user?.email?.split("@")[0] || "Guest workspace"}</strong>
+              <strong>{displayName(user, "Guest workspace")}</strong>
               <span>{user ? "Personal account" : "Exploring Vyntra"}</span>
             </div>
             {user ? (

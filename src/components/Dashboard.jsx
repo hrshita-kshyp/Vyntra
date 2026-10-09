@@ -13,6 +13,7 @@ import { ArrowUpRight, RefreshCw, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFitnessData } from "../hooks/useFitnessData";
 import { useAuth } from "../hooks/useAuth";
+import { displayName } from "../utils/userProfile";
 import StatCard from "./StatCard";
 import BioAgeScore from "./BioAgeScore";
 import {
@@ -37,7 +38,7 @@ export default function Dashboard() {
         section="YOUR DAILY CHECK-IN"
         title={
           user
-            ? `Hello, ${user.email?.split("@")[0] || "there"}.`
+            ? `Hello, ${displayName(user, "there")}.`
             : "A good day to move."
         }
         description="Your activity, a little perspective, and what comes next."
