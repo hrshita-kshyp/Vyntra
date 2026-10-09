@@ -9,8 +9,9 @@ export default function StatCard({
   detail,
 }) {
   const Icon = icons[icon] || Footprints;
+  const missing = value == null || value === "--";
   const numeric = Number(String(value).replace(/,/g, ""));
-  const percent = goal ? Math.max(0, Math.min((numeric / goal) * 100, 100)) : 0;
+  const percent = goal && !missing ? Math.max(0, Math.min((numeric / goal) * 100, 100)) : 0;
   return (
     <article className="stat-card">
       <div className="stat-label">
@@ -18,7 +19,7 @@ export default function StatCard({
         <Icon size={18} strokeWidth={1.6} />
       </div>
       <div className="stat-number">
-        {value}
+        {value ?? "--"}
         <span>{status}</span>
       </div>
       {goal ? (
@@ -34,7 +35,7 @@ export default function StatCard({
             <span style={{ width: `${percent}%` }} />
           </div>
           <p>
-            {Math.round(percent)}% of {goal.toLocaleString()} daily target
+            {missing ? "No reading yet" : Math.round(percent) + "% of " + goal.toLocaleString() + " daily target"}
           </p>
         </>
       ) : (

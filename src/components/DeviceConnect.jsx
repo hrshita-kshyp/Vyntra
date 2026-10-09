@@ -40,14 +40,14 @@ export default function DeviceConnect() {
       <section className="panel connection-panel">
         <PanelHeading
           title="Activity source"
-          description="A connection brings your own data into Vyntra."
+          description="Google Fit API support ends in 2026. Daily check-ins work independently."
         />
         <div className="connection-main">
           <span className="provider-icon">
             <Smartphone size={27} strokeWidth={1.5} />
           </span>
           <div>
-            <h3>Google Fit</h3>
+            <h3>Google Fit <small>Legacy integration</small></h3>
             <p>Steps, average heart rate, and energy expenditure.</p>
           </div>
           <span className={`status ${connected ? "status-live" : ""}`}>
@@ -64,7 +64,7 @@ export default function DeviceConnect() {
           <div className="connection-readings">
             <div>
               <span>Latest steps</span>
-              <strong>{fitData.today.steps.current.toLocaleString()}</strong>
+              <strong>{(fitData.today.steps.current?.toLocaleString() ?? "--")}</strong>
             </div>
             <div>
               <span>Heart rate</span>
@@ -76,7 +76,7 @@ export default function DeviceConnect() {
             <div>
               <span>Energy</span>
               <strong>
-                {fitData.today.calories.current.toLocaleString()}
+                {(fitData.today.calories.current?.toLocaleString() ?? "--")}
                 <small> kcal</small>
               </strong>
             </div>
@@ -203,7 +203,7 @@ export default function DeviceConnect() {
         <p>
           Open your source app and check that it is syncing to the same Google
           account you connected here. Refresh your activity once the upload is
-          complete. Vyntra shows sample data until device activity is available.
+          complete. Missing readings stay blank. Google sign-in alone does not grant fitness access. Day boundaries use your browser timezone. Energy includes resting metabolism, not just active calories.
         </p>
       </details>
     </div>

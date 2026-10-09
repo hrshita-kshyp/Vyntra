@@ -45,7 +45,7 @@ export const useAuth = () => {
       },
     });
   const signUp = (email, password) =>
-    configured ? supabase.auth.signUp({ email, password }) : unavailable();
+    configured ? supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/app` } }) : unavailable();
   const signIn = (email, password) =>
     configured
       ? supabase.auth.signInWithPassword({ email, password })

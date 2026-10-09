@@ -1,3 +1,4 @@
+import DailyJournal from "./DailyJournal";
 import { useState } from "react";
 import {
   AreaChart,
@@ -41,7 +42,7 @@ export default function Dashboard() {
         }
         description="Your activity, a little perspective, and what comes next."
       >
-        <DataNote live={data.isLive} />
+        <DataNote live={data.isLive} source={data.source} />
         {data.connected && (
           <button
             className="icon-button bordered"
@@ -55,7 +56,7 @@ export default function Dashboard() {
       </PageHeader>
       {!data.isLive && (
         <div className="notice">
-          <span>You are looking at a sample week.</span>
+          <span>No device data yet. Log your day or connect your activity.</span>
           <TextLink to="/app/connect">Connect your activity</TextLink>
         </div>
       )}
@@ -67,10 +68,11 @@ export default function Dashboard() {
           <TextLink to="/app/connect">Reconnect</TextLink>
         </div>
       )}
+      <div className="notice" role="status"><span>{data.error || (data.fetchedAt ? 'Last fetched ' + new Date(data.fetchedAt).toLocaleString() + '. Mobile Fit uploads may arrive later.' : 'Missing readings stay blank. Zero is shown only when reported.')} Averages use days with readings; today is partial.</span></div>
       <section className="metric-grid" aria-label="Today's metrics">
         <StatCard
           title="Steps"
-          value={data.steps.current.toLocaleString()}
+          value={(data.steps.current?.toLocaleString() ?? "--")}
           goal={data.steps.goal}
           icon="activity"
         />
@@ -83,19 +85,20 @@ export default function Dashboard() {
         />
         <StatCard
           title="Energy used"
-          value={data.calories.current.toLocaleString()}
+          value={(data.calories.current?.toLocaleString() ?? "--")}
           status="kcal"
           goal={data.calories.goal}
           icon="fire"
         />
         <StatCard
-          title="Recovery"
-          value={data.recovery.current}
+          title="Sleep logged"
+          value={Number(localStorage.getItem("user_avg_sleep")) || null}
           status="hrs"
           icon="moon"
-          detail="Estimated recovery window"
+          detail="Self-reported profile average"
         />
       </section>
+      <DailyJournal />
       <div className="overview-grid">
         <section className="panel activity-panel">
           <PanelHeading
@@ -120,7 +123,7 @@ export default function Dashboard() {
               {(metric === "steps"
                 ? data.averages.avgSteps
                 : data.averages.avgCalories
-              ).toLocaleString()}
+              )?.toLocaleString() ?? "--"}
             </strong>
             <span>{metric === "steps" ? "steps" : "kcal"} / daily average</span>
           </div>
@@ -178,14 +181,14 @@ export default function Dashboard() {
             <TextLink to="/app/analytics">View activity</TextLink>
           </div>
         </section>
-        <BioAgeScore averages={data.averages} isDemo={!data.isLive} />
+        <BioAgeScore data={data} />
       </div>
       <div className="overview-bottom">
         <section className="next-step">
           <span className="kicker">A SMALL NEXT STEP</span>
           <h2>
-            {remaining > 0
-              ? `${remaining.toLocaleString()} steps to your target.`
+            {data.steps.current == null ? "Your next step starts here." : remaining > 0
+              ? `${(remaining?.toLocaleString() ?? "--")} steps to your target.`
               : "Your step target is complete."}
           </h2>
           <p>
@@ -212,7 +215,7 @@ export default function Dashboard() {
               <span
                 key={day.date}
                 className={day.steps >= data.steps.goal ? "complete" : ""}
-                title={`${day.date}: ${day.steps.toLocaleString()} steps`}
+                title={`${day.date}: ${(day.steps?.toLocaleString() ?? "--")} steps`}
               >
                 {day.date[0]}
               </span>

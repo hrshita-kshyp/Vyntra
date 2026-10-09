@@ -25,15 +25,14 @@ const sections = [
           </li>
           <li>
             <strong>Optional profile and goals.</strong> Birth year, average
-            sleep hours, daily step and energy targets, and a saved coach
+            sleep hours, daily step and energy targets, daily check-ins, personal notes, habits, workout entries, and a saved coach
             session are stored in your browser.
           </li>
           <li>
             <strong>Connected activity.</strong> If you authorize a Google Fit
-            connection, Vyntra requests read access to activity, heart-rate, and
-            sleep information. The current integration reads daily steps,
+            connection, Vyntra requests read access to activity and heart-rate information. The current integration reads daily steps,
             average heart rate, and energy expenditure for activity charts and
-            wellness estimates. Sleep displayed from your profile is entered by
+            activity summaries. Sleep displayed from your profile is entered by
             you; it is not currently fetched from Google Fit.
           </li>
           <li>
@@ -54,15 +53,12 @@ const sections = [
       <>
         <p>
           We use this information to sign you in, display your activity, compare
-          it with your targets, generate habit-based wellness estimates, and
+          it with your targets, summarize progress against your targets, and
           provide coaching features. Sample data is labeled and is not a
           measurement of your health.
         </p>
         <p>
-          When you are signed in and have connected activity, the app may save
-          activity snapshots to Supabase, associated with your account
-          identifier and a timestamp. These snapshots include steps, heart rate,
-          energy expenditure, and the app's estimated recovery hours.
+          Connected activity is used in memory for your charts. The current app does not automatically upload activity snapshots to Supabase. Older snapshots, if previously saved, may remain until removed separately.
         </p>
         <p>
           Vyntra does not sell personal information or use connected Google
@@ -81,7 +77,7 @@ const sections = [
             <dt>Supabase</dt>
             <dd>
               Processes authentication, sessions, and account-linked activity
-              snapshots.{" "}
+              snapshots previously saved by earlier versions.{" "}
               <a href="https://supabase.com/privacy">Supabase privacy policy</a>
               .
             </dd>
@@ -97,20 +93,7 @@ const sections = [
               .
             </dd>
           </div>
-          <div>
-            <dt>Groq</dt>
-            <dd>
-              If AI coaching is configured, opening Coach with connected
-              activity sends selected metrics to Groq to generate
-              recommendations: steps and targets, heart rate, energy expenditure
-              and targets, and estimated recovery hours. The prompt does not
-              include your email, name, or birth year. This processing is
-              separate from Google sign-in.{" "}
-              <a href="https://groq.com/privacy-policy/">Groq privacy policy</a>
-              .
-            </dd>
-          </div>
-          <div>
+<div>
             <dt>Vercel</dt>
             <dd>
               Hosts the deployed website and processes requests needed to serve
@@ -142,7 +125,7 @@ const sections = [
         <p>
           Vyntra uses browser local storage for sign-in sessions, Google Fit
           access tokens and their expiry, optional profile details, targets, and
-          your saved coach session. The app does not include an advertising
+          your saved coach session and account-scoped journal. Journal export includes notes; weekly sharing excludes notes and health readings. Local coach suggestions run in your browser without sending metrics to an AI provider. The app does not include an advertising
           tracker.
         </p>
         <p>
@@ -204,7 +187,7 @@ const sections = [
           method can be guaranteed completely secure.
         </p>
         <p>
-          Activity readings, recovery estimates, wellness estimates, and
+          Activity readings, activity summaries, and
           generated coaching are informational. They are not medical diagnoses
           or a substitute for professional advice.
         </p>

@@ -19,7 +19,8 @@ import { GoogleFitProvider } from "./hooks/useGoogleFit";
 import { useAuth } from "./hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
-const AppLayout = () => (
+const AppLayout = ({ accountId }) => (
+  <GoogleFitProvider key={accountId} accountId={accountId}>
   <div className="app-shell">
     <Sidebar />
     <main className="app-main">
@@ -34,6 +35,7 @@ const AppLayout = () => (
       </Suspense>
     </main>
   </div>
+  </GoogleFitProvider>
 );
 
 function App() {
@@ -46,8 +48,7 @@ function App() {
   );
 
   return (
-    <GoogleFitProvider>
-      <Router>
+<Router>
         <Routes>
           {/* Public landing page */}
           <Route path="/" element={<Landing />} />
@@ -74,7 +75,7 @@ function App() {
               loading ? (
                 loadingScreen
               ) : user ? (
-                <AppLayout />
+                <AppLayout accountId={user.id} />
               ) : (
                 <Navigate to="/auth" replace />
               )
@@ -91,8 +92,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
-    </GoogleFitProvider>
-  );
+);
 }
 
 export default App;

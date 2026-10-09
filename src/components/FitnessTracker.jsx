@@ -33,7 +33,7 @@ export default function FitnessTracker() {
         title="Something to work toward."
         description="Set a couple of daily targets. Adjust them as life changes."
       >
-        <DataNote live={data.isLive} />
+        <DataNote live={data.isLive} source={data.source} />
       </PageHeader>
       <div className="goals-layout">
         <form className="panel goals-form" onSubmit={save}>
@@ -73,7 +73,7 @@ export default function FitnessTracker() {
                   <p>{item.description}</p>
                 </div>
                 <span className="goal-percentage">
-                  {Math.min(
+                  {item.current == null ? "--" : Math.min(
                     100,
                     Math.round((item.current / Number(item.value || 1)) * 100),
                   )}
@@ -104,9 +104,9 @@ export default function FitnessTracker() {
                 />
               </div>
               <p className="goal-current">
-                {item.current.toLocaleString()}{" "}
+                {(item.current?.toLocaleString() ?? "--")}{" "}
                 {item.id === "steps" ? "steps" : "kcal"}{" "}
-                {data.isLive ? "today" : "in the sample day"}
+                {data.isLive ? "today" : "in your check-in"}
               </p>
             </section>
           ))}

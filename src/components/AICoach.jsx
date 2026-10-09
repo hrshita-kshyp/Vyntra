@@ -54,7 +54,7 @@ export default function AICoach() {
         description="Keep it manageable. Leave room for real life."
       >
         <span className="status">
-          {insights ? "Personalized plan" : "Example plan"}
+          {insights ? "Activity-based plan" : "Example plan"}
         </span>
       </PageHeader>
       {loading && (
@@ -161,7 +161,7 @@ export default function AICoach() {
       <div className="coach-footer">
         <span>
           {insights
-            ? "Your plan uses connected activity data."
+            ? "A local rule compares today?s reported steps with your chosen target. No metrics are sent to an AI provider."
             : "This is a general example, not a personalized assessment."}
         </span>
         <Link to="/app/connect">

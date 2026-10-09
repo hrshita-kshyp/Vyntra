@@ -2306,3 +2306,32 @@ input:focus {
     padding-bottom: 30px;
   }
 }
+
+/* Personal journal */
+.journal-panel { margin-bottom: 24px; }
+.journal-toolbar, .journal-footer { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; margin:20px 0; }
+.journal-toolbar .field-label { max-width:220px; }
+.journal-week { display:flex; gap:7px; }
+.journal-week button { display:flex; align-items:center; justify-content:center; gap:3px; width:34px; height:38px; border:1px solid #dbe0d7; border-radius:6px; background:transparent; color:#58675e; }
+.journal-week button.done { background:#e4efe6; color:#246555; }
+.journal-week button[aria-pressed="true"] { outline:2px solid #286457; outline-offset:2px; }
+.journal-columns { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+.journal-fields { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.journal-panel .field-label { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.journal-panel input:not([type="checkbox"]), .journal-panel select, .journal-panel textarea { width:100%; min-width:0; border:1px solid #d8ded4; border-radius:6px; padding:10px 12px; background:#fafbf7; color:#293f35; font:inherit; }
+.journal-panel textarea { resize:vertical; }
+.journal-manual { margin:4px 0 20px; }
+.journal-manual summary { cursor:pointer; font-size:14px; }
+.journal-manual .journal-fields { margin-top:12px; }
+.journal-habits { display:grid; gap:12px; margin:16px 0 24px; }
+.journal-habits label { display:flex; align-items:center; gap:10px; font-size:14px; }
+.journal-habits input { accent-color:#286457; width:17px; height:17px; }
+.workout-form { display:grid; grid-template-columns:1fr 80px 40px; gap:8px; margin:14px 0; }
+.workout-list { list-style:none; padding:0; }
+.workout-list li { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e8df; padding:7px 0; }
+.workout-list small { margin-left:12px; color:#718078; }
+.context-note { background:#f0f3e9; border-left:2px solid #7c9175; padding:16px; margin-top:20px; }
+.context-note p { font-size:14px; line-height:1.6; margin:10px 0 0; }
+.journal-footer { border-top:1px solid #e5e8df; padding-top:16px; font-size:13px; }
+.journal-footer > div { display:flex; flex-wrap:wrap; gap:4px; }
+@media(max-width:760px) { .journal-columns { grid-template-columns:1fr; gap:28px; } .journal-fields { grid-template-columns:1fr; } .journal-toolbar { gap:12px; } .journal-toolbar .field-label { max-width:100%; } }

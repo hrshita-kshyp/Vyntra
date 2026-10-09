@@ -19,16 +19,17 @@ import { PageHeader, PanelHeading, DataNote, ChartTooltip } from "./UI";
 export default function HealthAnalytics() {
   const data = useFitnessData();
   const [metric, setMetric] = useState("steps");
-  const total = data.weeklyData.reduce((sum, day) => sum + day[metric], 0);
-  const best = data.weeklyData.reduce((a, b) =>
-    a[metric] >= b[metric] ? a : b,
+  const total = data.weeklyData.some(day => Number.isFinite(day[metric])) ? data.weeklyData.reduce((sum, day) => sum + (day[metric] ?? 0), 0) : null;
+  const best = data.weeklyData.filter(day => Number.isFinite(day[metric])).reduce((a, b) =>
+    (a?.[metric] ?? -1) >= (b[metric] ?? -1) ? a : b,
+    null,
   );
   function download() {
     const csv =
-      "Day,Steps,Heart rate (bpm),Energy (kcal)\n" +
+      "Date,Source,Steps,Heart rate (bpm),Energy (kcal)\n" +
       data.weeklyData
         .map((day) =>
-          [day.date, day.steps, day.heartRate ?? "", day.calories].join(","),
+          [day.dateKey, data.source, day.steps ?? "", day.heartRate ?? "", day.calories ?? ""].join(","),
         )
         .join("\n");
     const url = URL.createObjectURL(
@@ -36,7 +37,7 @@ export default function HealthAnalytics() {
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = `vyntra-${data.isLive ? "activity" : "sample"}-week.csv`;
+    a.download = `vyntra-${data.isLive ? "activity" : "check-in"}-week.csv`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -47,7 +48,7 @@ export default function HealthAnalytics() {
         title="Your week, in perspective."
         description="See your rhythm. Notice what works."
       >
-        <DataNote live={data.isLive} />
+        <DataNote live={data.isLive} source={data.source} />
         <button className="button button-outline" onClick={download}>
           <Download size={16} />
           Export week
@@ -57,23 +58,21 @@ export default function HealthAnalytics() {
         <div>
           <span>Total steps</span>
           <strong>
-            {data.weeklyData
-              .reduce((sum, day) => sum + day.steps, 0)
-              .toLocaleString()}
+            {data.weeklyData.some(day => Number.isFinite(day.steps)) ? data.weeklyData.reduce((sum, day) => sum + (day.steps ?? 0), 0).toLocaleString() : "--"}
             <small>this week</small>
           </strong>
         </div>
         <div>
           <span>Average heart rate</span>
           <strong>
-            {data.averages.avgHR}
+            {data.averages.avgHR ?? "--"}
             <small>bpm</small>
           </strong>
         </div>
         <div>
           <span>Average daily energy</span>
           <strong>
-            {data.averages.avgCalories.toLocaleString()}
+            {(data.averages.avgCalories?.toLocaleString() ?? "--")}
             <small>kcal</small>
           </strong>
         </div>
@@ -84,7 +83,7 @@ export default function HealthAnalytics() {
           description={
             data.isLive
               ? "Your connected activity, day by day."
-              : "A sample of seven days of activity."
+              : "Your daily check-ins. Missing readings stay blank."
           }
         >
           <div className="segmented">
@@ -146,7 +145,7 @@ export default function HealthAnalytics() {
                 {data.weeklyData.map((day) => (
                   <Cell
                     key={day.date}
-                    fill={day.date === best.date ? "#286457" : "#bbcec1"}
+                    fill={day.date === best?.date ? "#286457" : "#bbcec1"}
                   />
                 ))}
               </Bar>
@@ -155,11 +154,11 @@ export default function HealthAnalytics() {
         </div>
         <div className="chart-footer">
           <span>
-            {total.toLocaleString()} {metric === "steps" ? "steps" : "kcal"}{" "}
+            {(total?.toLocaleString() ?? "--")} {metric === "steps" ? "steps" : "kcal"}{" "}
             across the week
           </span>
           <span>
-            Best day: <strong>{best.date}</strong>
+            Best day: <strong>{best?.date ?? "No reading"}</strong>
           </span>
         </div>
       </section>
@@ -167,7 +166,7 @@ export default function HealthAnalytics() {
         <section className="panel">
           <PanelHeading
             title="Heart rate"
-            description="Daily averages, in beats per minute."
+            description="Daily averages, not resting heart rate. Gaps mean no readings."
           />
           <div className="chart-frame chart-short">
             <ResponsiveContainer width="100%" height="100%">
@@ -197,8 +196,7 @@ export default function HealthAnalytics() {
                   stroke="#ae705a"
                   strokeWidth={2}
                   dot={{ r: 3, strokeWidth: 0, fill: "#ae705a" }}
-                  connectNulls
-                />
+/>
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -213,14 +211,14 @@ export default function HealthAnalytics() {
             days above your step target.
           </h2>
           <p>
-            The busiest day was {best.date}. A weekly view helps you see the
+            {best ? "The highest recorded day was " + best.date + "." : "No readings for this metric yet."} A weekly view helps you see the
             quieter days too, without making every day a competition.
           </p>
           <ArrowUpRight size={28} />
           <span className="fine-print">
             {data.isLive
               ? "Based on your connected activity."
-              : "Based on sample activity. Connect your device for your own patterns."}
+              : "Based on your daily check-ins."}
           </span>
         </section>
       </div>
@@ -241,14 +239,14 @@ export default function HealthAnalytics() {
               {data.weeklyData.map((day) => (
                 <tr key={day.date}>
                   <th scope="row">{day.date}</th>
-                  <td>{day.steps.toLocaleString()}</td>
+                  <td>{(day.steps?.toLocaleString() ?? "--")}</td>
                   <td>{day.heartRate ?? "--"} bpm</td>
-                  <td>{day.calories.toLocaleString()} kcal</td>
+                  <td>{(day.calories?.toLocaleString() ?? "--")} kcal</td>
                   <td>
                     <span
                       className={`status ${day.steps >= data.steps.goal ? "status-live" : ""}`}
                     >
-                      {day.steps >= data.steps.goal ? "Reached" : "In progress"}
+                      {day.steps == null ? "No reading" : day.steps >= data.steps.goal ? "Reached" : "Below target"}
                     </span>
                   </td>
                 </tr>

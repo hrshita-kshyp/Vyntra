@@ -12,11 +12,11 @@ export function PageHeader({ section, title, description, children }) {
     </header>
   );
 }
-export function DataNote({ live }) {
+export function DataNote({ live, source }) {
   return (
     <span className={`status ${live ? "status-live" : ""}`}>
       <span className="status-dot" />
-      {live ? "Device data" : "Sample data"}
+      {source || (live ? "Device data" : "No activity yet")}
     </span>
   );
 }
