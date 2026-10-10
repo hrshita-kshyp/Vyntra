@@ -12,7 +12,7 @@ import { useGoogleFit } from "../hooks/useGoogleFit";
 import { PageHeader, PanelHeading } from "./UI";
 
 export default function DeviceConnect() {
-  const { connected, fitData, loading, error, connect, disconnect, refresh } =
+  const { connected, needsReconnect, fitData, loading, error, connect, disconnect, refresh } =
     useGoogleFit();
   const [birthYear, setBirthYear] = useState(
     () => localStorage.getItem("user_birth_year") || "",
@@ -52,7 +52,7 @@ export default function DeviceConnect() {
           </div>
           <span className={`status ${connected ? "status-live" : ""}`}>
             <span className="status-dot" />
-            {connected ? "Connected" : "Not connected"}
+            {connected ? "Connected" : needsReconnect ? "Session expired" : "Not connected"}
           </span>
         </div>
         {error && (
@@ -121,7 +121,7 @@ export default function DeviceConnect() {
                 ) : (
                   <Cable size={16} />
                 )}
-                Connect Google Fit
+                {needsReconnect ? "Renew Google Fit session" : "Connect Google Fit"}
                 <ArrowUpRight size={16} />
               </button>
             )}

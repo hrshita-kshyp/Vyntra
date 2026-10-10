@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { connectGoogleFit, disconnectGoogleFit, isGoogleFitConnected, fetchGoogleFitData, getStoredToken, hasPreviousConnection } from '../services/googleFitService';
+import { connectGoogleFit, disconnectGoogleFit, isGoogleFitConnected, fetchGoogleFitData, getStoredToken, hasPreviousConnection, restoreGoogleFitAccount } from '../services/googleFitService';
 const FitContext = createContext(null);
 export const useGoogleFit = () => useContext(FitContext);
 export const GoogleFitProvider = ({ children, accountId }) => {
@@ -22,9 +22,10 @@ export const GoogleFitProvider = ({ children, accountId }) => {
   }, []);
   useEffect(() => {
     const counter = generation;
-    if (localStorage.getItem('gfit_account_id') !== accountId) {
-      disconnectGoogleFit(); localStorage.removeItem('gfit_account_id');
-    } else if (isGoogleFitConnected()) loadFitData();
+    restoreGoogleFitAccount(accountId);
+    setConnected(isGoogleFitConnected());
+    setNeedsReconnect(!isGoogleFitConnected() && hasPreviousConnection());
+    if (isGoogleFitConnected()) loadFitData();
     return () => { counter.current++; };
   }, [accountId, loadFitData]);
   useEffect(() => {
@@ -35,7 +36,7 @@ export const GoogleFitProvider = ({ children, accountId }) => {
   const connect = async () => {
     if (oauthInProgress.current) return;
     oauthInProgress.current = true; setLoading(true); setError(null);
-    try { await connectGoogleFit(); localStorage.setItem('gfit_account_id', accountId); setFitData(null); setConnected(true); setNeedsReconnect(false); await loadFitData(); }
+    try { await connectGoogleFit(hasPreviousConnection() ? { prompt: '' } : {}); localStorage.setItem('gfit_account_id', accountId); setFitData(null); setConnected(true); setNeedsReconnect(false); await loadFitData(); }
     catch (err) { setError(err.message); }
     finally { setLoading(false); oauthInProgress.current = false; }
   };

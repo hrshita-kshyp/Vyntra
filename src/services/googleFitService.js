@@ -9,6 +9,26 @@ const FITNESS_SCOPES = [
 
 const TOKEN_KEY = 'gfit_access_token';
 const TOKEN_EXPIRY_KEY = 'gfit_token_expiry';
+const ACCOUNT_KEY = 'gfit_account_id';
+const CONNECTION_KEY = 'gfit_previously_connected';
+
+// Preserve each Vyntra account's connection without revoking Google consent
+// when another Vyntra account signs in on the same browser.
+export const restoreGoogleFitAccount = accountId => {
+  const previous = localStorage.getItem(ACCOUNT_KEY);
+  if (previous === accountId) return;
+  if (previous) localStorage.setItem('gfit_session_' + previous, JSON.stringify({
+    token: localStorage.getItem(TOKEN_KEY), expiry: localStorage.getItem(TOKEN_EXPIRY_KEY),
+    connected: hasPreviousConnection(),
+  }));
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('gfit_session_' + accountId)); } catch { /* Ignore invalid saved storage. */ }
+  for (const key of [TOKEN_KEY, TOKEN_EXPIRY_KEY, CONNECTION_KEY]) localStorage.removeItem(key);
+  if (saved?.token) localStorage.setItem(TOKEN_KEY, saved.token);
+  if (saved?.expiry) localStorage.setItem(TOKEN_EXPIRY_KEY, saved.expiry);
+  if (saved?.connected) localStorage.setItem(CONNECTION_KEY, 'true');
+  localStorage.setItem(ACCOUNT_KEY, accountId);
+};
 
 // Wait for Google Identity Services to load
 const waitForGIS = () =>
@@ -38,7 +58,7 @@ export const getStoredToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
-export const hasPreviousConnection = () => !!localStorage.getItem(TOKEN_KEY);
+export const hasPreviousConnection = () => !!localStorage.getItem(TOKEN_KEY) || localStorage.getItem(CONNECTION_KEY) === 'true';
 
 export const connectGoogleFit = async (options = {}) => {
   if (!GOOGLE_CLIENT_ID) {
@@ -61,6 +81,7 @@ export const connectGoogleFit = async (options = {}) => {
           return;
         }
         localStorage.setItem(TOKEN_KEY, response.access_token);
+        localStorage.setItem(CONNECTION_KEY, 'true');
         localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + Number(response.expires_in || 3600) * 1000));
         resolve(response.access_token);
       },
@@ -80,8 +101,8 @@ export const connectGoogleFit = async (options = {}) => {
   });
 };
 
-// Attempt to silently renew the token without showing a popup.
-// Works when the user has already granted permissions in this browser session.
+// Request renewal from a user action, without forcing repeat consent.
+// Google may still show its authorization dialog.
 export const silentRefreshToken = () => connectGoogleFit({ prompt: '' });
 
 export const disconnectGoogleFit = () => {
@@ -91,6 +112,9 @@ export const disconnectGoogleFit = () => {
   }
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_EXPIRY_KEY);
+  localStorage.removeItem(CONNECTION_KEY);
+  const account = localStorage.getItem(ACCOUNT_KEY);
+  if (account) localStorage.removeItem('gfit_session_' + account);
 };
 
 // Request each local calendar day separately, including DST boundaries.
@@ -111,6 +135,7 @@ export const fetchGoogleFitData = async (accessToken) => {
       }),
     });
     if (res.status === 401) {
+      localStorage.setItem(CONNECTION_KEY, 'true');
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(TOKEN_EXPIRY_KEY);
       throw new Error('Session expired. Please reconnect Google Fit.');
