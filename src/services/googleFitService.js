@@ -1,4 +1,5 @@
 import { calendarWeek, parseFitDay, summarizeWeek } from '../utils/activityData';
+import { supabase } from './supabaseService';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -11,6 +12,39 @@ const TOKEN_KEY = 'gfit_access_token';
 const TOKEN_EXPIRY_KEY = 'gfit_token_expiry';
 const ACCOUNT_KEY = 'gfit_account_id';
 const CONNECTION_KEY = 'gfit_previously_connected';
+
+async function cloudRequest(action, body, expectedAccount) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Sign in to Vyntra first.');
+  if (expectedAccount && session.user.id !== expectedAccount) throw new Error('Your account changed. Try again in your current account.');
+  const response = await fetch('/api/google-fit?action=' + action, {
+    method: action === 'status' ? 'GET' : 'POST',
+    headers: { Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json', 'X-Requested-With': 'Vyntra' },
+    ...(action === 'status' ? {} : { body: JSON.stringify(body || {}) }),
+  });
+  if (response.status === 404 || (response.ok && !response.headers.get('content-type')?.includes('application/json'))) return { enabled: false };
+  const data = await response.json();
+  if (!response.ok) throw Object.assign(new Error(data.error || 'Google Fit connection could not be loaded.'), { code: data.code });
+  return data;
+}
+function storeAccess(data) {
+  localStorage.setItem(TOKEN_KEY, data.accessToken);
+  localStorage.setItem(TOKEN_EXPIRY_KEY, String(data.expiresAt));
+  localStorage.setItem(CONNECTION_KEY, 'true');
+}
+export async function getGoogleFitSession(force = false) {
+  const account = localStorage.getItem(ACCOUNT_KEY);
+  const status = await cloudRequest('status', undefined, account);
+  if (!status.enabled || !status.connected) return { token: getStoredToken(), automatic: false };
+  const data = await cloudRequest('token', { force }, account);
+  if (!data.connected) return { token: null, automatic: true };
+  if (localStorage.getItem(ACCOUNT_KEY) === account) storeAccess(data);
+  return { token: data.accessToken, automatic: true };
+}
+export async function disconnectCloudGoogleFit() {
+  const status = await cloudRequest('status');
+  if (status.enabled && status.connected) await cloudRequest('disconnect');
+}
 
 // Preserve each Vyntra account's connection without revoking Google consent
 // when another Vyntra account signs in on the same browser.
@@ -65,6 +99,22 @@ export const connectGoogleFit = async (options = {}) => {
     throw new Error('VITE_GOOGLE_CLIENT_ID is not set in your .env file.');
   }
   await waitForGIS();
+  const account = localStorage.getItem(ACCOUNT_KEY);
+  const status = await cloudRequest('status', undefined, account);
+  if (status.enabled) {
+    return new Promise((resolve, reject) => {
+      const client = window.google.accounts.oauth2.initCodeClient({
+        client_id: GOOGLE_CLIENT_ID, scope: FITNESS_SCOPES, ux_mode: 'popup',
+        callback: async response => {
+          if (response.error || !response.code) { reject(new Error('Google authorization was not completed.')); return; }
+          try { const data = await cloudRequest('connect', { code: response.code }, account); if (localStorage.getItem(ACCOUNT_KEY) !== account) throw new Error('Your account changed. Connect again in your current account.'); storeAccess(data); resolve(data.accessToken); }
+          catch (error) { reject(error); }
+        },
+        error_callback: () => reject(new Error('Google window was closed or blocked. Please try again.')),
+      });
+      client.requestCode();
+    });
+  }
 
   return new Promise((resolve, reject) => {
     const tokenClient = window.google.accounts.oauth2.initTokenClient({
@@ -135,9 +185,11 @@ export const fetchGoogleFitData = async (accessToken) => {
       }),
     });
     if (res.status === 401) {
-      localStorage.setItem(CONNECTION_KEY, 'true');
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(TOKEN_EXPIRY_KEY);
+      if (localStorage.getItem(TOKEN_KEY) === accessToken) {
+        localStorage.setItem(CONNECTION_KEY, 'true');
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(TOKEN_EXPIRY_KEY);
+      }
       throw new Error('Session expired. Please reconnect Google Fit.');
     }
     if (res.status === 403) throw new Error('Google Fit access was denied. Check account permissions and API availability, or use a daily check-in.');

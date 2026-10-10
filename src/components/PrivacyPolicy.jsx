@@ -58,7 +58,7 @@ const sections = [
           measurement of your health.
         </p>
         <p>
-          Connected activity is used in memory for your charts. The current app does not automatically upload activity snapshots to Supabase. Older snapshots, if previously saved, may remain until removed separately.
+          Connected activity is used in memory for your charts. The current app does not automatically upload activity snapshots to Supabase. When automatic renewal is enabled, encrypted Google authorization tokens are stored in a server-only Supabase table so your connection can be restored after sign-in. Disconnect deletes that saved connection. Older activity snapshots, if previously saved, may remain until removed separately.
         </p>
         <p>
           Vyntra does not sell personal information or use connected Google
