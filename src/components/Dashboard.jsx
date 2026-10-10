@@ -16,6 +16,7 @@ import { useAuth } from "../hooks/useAuth";
 import { displayName } from "../utils/userProfile";
 import StatCard from "./StatCard";
 import BioAgeScore from "./BioAgeScore";
+import BioAgePanel from "./BioAgePanel";
 import {
   PageHeader,
   DataNote,
@@ -224,6 +225,7 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+      <BioAgePanel data={data} />
     </div>
   );
 }

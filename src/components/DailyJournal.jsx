@@ -3,6 +3,7 @@ import { Check, Plus, Trash2, Download, Share2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { calendarWeek, dateKey } from '../utils/activityData';
 import { PanelHeading } from './UI';
+import JournalBackup from './JournalBackup';
 const subscribe = callback => { window.addEventListener('vyntra-journal', callback); return () => window.removeEventListener('vyntra-journal', callback); };
 const habits = ['Move a little', 'Take a screen break', 'Wind down'];
 export default function DailyJournal() {
@@ -12,6 +13,7 @@ export default function DailyJournal() {
   let journal = {}; try { journal = JSON.parse(raw || '{}'); } catch { /* Ignore damaged storage. */ }
   const [selected, setSelected] = useState(dateKey());
   const [message, setMessage] = useState('');
+  const [restoreVersion, setRestoreVersion] = useState(0);
   const [workout, setWorkout] = useState('Walk');
   const [minutes, setMinutes] = useState('20');
   const entry = journal[selected] || {};
@@ -43,7 +45,7 @@ export default function DailyJournal() {
   return <section className="panel journal-panel">
     <PanelHeading title="Your day, in context" description="Numbers tell part of the story. Keep the rest here."><span className="status">{streak} day streak</span></PanelHeading>
     <div className="journal-toolbar"><label className="field-label">Choose a day<input aria-label="Journal date" type="date" max={dateKey()} value={selected} onChange={event => { setSelected(event.target.value); setMessage(''); }} /></label><div className="journal-week" aria-label="This week's check-ins">{week.map(day => <button key={day.dateKey} title={day.dateKey} aria-pressed={selected === day.dateKey} className={journal[day.dateKey]?.checkedIn ? 'done' : ''} onClick={() => setSelected(day.dateKey)}>{day.date[0]}{journal[day.dateKey]?.checkedIn && <Check size={12} />}</button>)}</div></div>
-    <div className="journal-columns"><form key={selected + key} onSubmit={checkIn}>
+    <div className="journal-columns"><form key={selected + key + restoreVersion} onSubmit={checkIn}>
       <div className="journal-fields"><label className="field-label">How did you feel?<select name="mood" defaultValue={entry.mood || 'Steady'}>{['Low energy', 'Steady', 'Energized'].map(value => <option key={value}>{value}</option>)}</select></label><label className="field-label">Time for movement (min)<input name="time" type="number" min="0" max="1440" defaultValue={entry.time ?? ''} placeholder="Optional" /></label></div>
       <details className="journal-manual"><summary>Log activity manually</summary><p className="fine-print">Separate from Google Fit; manual numbers never overwrite device readings.</p><div className="journal-fields">{[['steps', 'Steps', 100000], ['calories', 'Total energy (kcal)', 10000], ['heartRate', 'Average heart rate (bpm)', 250]].map(([name, label, max]) => <label className="field-label" key={name}>{label}<input type="number" name={name} min="0" max={max} step="1" defaultValue={entry.activity?.[name] ?? ''} placeholder="Leave blank if unknown" /></label>)}</div></details>
       <label className="field-label">A note to future you<textarea name="note" maxLength="500" defaultValue={entry.note || ''} placeholder="What helped? What got in the way?" rows="2" /></label>
@@ -56,5 +58,6 @@ export default function DailyJournal() {
     </div></div>
     <div className="journal-footer"><span>{completed}/7 check-ins · {workoutMinutes} min logged this week</span><div><button className="button button-text" onClick={share}><Share2 size={15} />Share week</button><button className="button button-text" onClick={exportJournal}><Download size={15} />Export journal</button><button className="button button-text danger" onClick={() => { const next = { ...journal }; delete next[selected]; commit(next); setMessage('Selected day cleared.'); }}><Trash2 size={15} />Clear day</button></div></div>
     <p className="fine-print" role="status">{message || 'Private browser storage, scoped to your account. Sharing includes only check-in and workout totals.'}</p>
+    {user && <JournalBackup key={user.id} accountId={user.id} raw={raw} onRestore={next => { commit(next); setRestoreVersion(value => value + 1); }} />}
   </section>;
 }

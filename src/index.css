@@ -2308,6 +2308,15 @@ input:focus {
 }
 
 /* Personal journal */
+.journal-backup { border-top:1px solid var(--line); margin-top:24px; padding-top:24px; }
+.backup-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+.backup-heading h3 { display:flex; align-items:center; gap:10px; }
+.journal-backup > p:not(.fine-print), .backup-delete p { color:#63735c; font-size:14px; line-height:1.7; margin:14px 0; max-width:760px; }
+.backup-actions { display:flex; gap:12px; flex-wrap:wrap; }
+.backup-delete { background:#f4eee7; padding:16px; border-radius:8px; margin-top:16px; }
+.bio-age-panel { margin-top:24px; }
+.bio-age-panel > p:not(.fine-print) { max-width:760px; color:#63735c; line-height:1.7; font-size:14px; margin:18px 0; }
+.bio-age-panel .detail-list { max-width:760px; }
 .landing-film { margin:0; min-width:0; }
 .landing-film video { display:block; width:100%; aspect-ratio:16/9; background:#203b31; border-radius:12px; border:1px solid var(--line); }
 .landing-film figcaption, .feature-story figcaption { color:#6f7c65; font-size:11px; line-height:1.6; margin-top:12px; }

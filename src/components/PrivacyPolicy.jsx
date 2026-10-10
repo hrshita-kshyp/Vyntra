@@ -59,7 +59,8 @@ const sections = [
         </p>
         <p>
           Connected activity is used in memory for your charts. The current app does not automatically upload activity snapshots to Supabase. When automatic renewal is enabled, encrypted Google authorization tokens are stored in a server-only Supabase table so your connection can be restored after sign-in. Disconnect deletes that saved connection. Older activity snapshots, if previously saved, may remain until removed separately.
-        </p>
+          </p>
+          <p>When Pro cloud journal backup is available, choosing Back up journal uploads an encrypted copy of your check-ins, notes, habits, and workouts to Supabase. It is not automatic. Restore merges cloud days into this browser and preserves existing local days. You can restore or delete an existing cloud copy after Pro expires. Deleting the cloud copy leaves your local journal intact; deleting local days does not update an existing cloud backup.</p>
         <p>
           Vyntra does not sell personal information or use connected Google
           activity for advertising.
